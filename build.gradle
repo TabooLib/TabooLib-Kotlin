@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.0-rc'
+}
+
+group = 'io.izzel.taboolib.kotlin'
+version = '1.0.1'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    maven { url "http://repo.ptms.ink/repository/codemc-nms/" }
+    maven { url "http://repo.ptms.ink/repository/maven-releases/" }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'ink.ptms.core:v11600:11600:all'
+    compile 'io.izzel.taboolib:TabooLib:5.37:all'
+    compile "org.jetbrains.kotlin:kotlin-stdlib"
+}
