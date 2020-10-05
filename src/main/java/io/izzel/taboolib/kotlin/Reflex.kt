@@ -4,6 +4,7 @@ import com.google.common.collect.Maps
 import io.izzel.taboolib.util.Ref
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author sky
@@ -24,7 +25,7 @@ class Reflex(val from: Class<*>) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap()
+            }.toMap(ConcurrentHashMap())
         }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) ($from)")
         val obj = Ref.getField(instance, field)
         return if (obj != null) obj as T else null
@@ -35,7 +36,7 @@ class Reflex(val from: Class<*>) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap()
+            }.toMap(ConcurrentHashMap())
         }
         val obj = Ref.getField(instance, map[name] ?: throw NoSuchFieldException("$name ($from)"))
         return if (obj != null) obj as T else null
@@ -46,7 +47,7 @@ class Reflex(val from: Class<*>) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap()
+            }.toMap(ConcurrentHashMap())
         }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) ($from)")
         Ref.putField(instance, field, value)
     }
@@ -56,7 +57,7 @@ class Reflex(val from: Class<*>) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap()
+            }.toMap(ConcurrentHashMap())
         }
         Ref.putField(instance, map[name] ?: throw NoSuchFieldException("$name ($from)"), value)
     }
@@ -66,7 +67,7 @@ class Reflex(val from: Class<*>) {
             Ref.getDeclaredMethods(from).map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap()
+            }.toMap(ConcurrentHashMap())
         }
         val method = map[name] ?: throw NoSuchMethodException("$name ($from)")
         method.invoke(instance, parameter)
