@@ -62,7 +62,7 @@ class Reflex(val from: Class<*>) {
         Ref.putField(instance, map[name] ?: throw NoSuchFieldException("$name ($from)"), value)
     }
 
-    fun invoke(name: String, vararg parameter: Any?) {
+    fun <T> invoke(name: String, vararg parameter: Any?): T? {
         val map = cachedMethod.computeIfAbsent(from.name) {
             Ref.getDeclaredMethods(from).map {
                 it.isAccessible = true
@@ -70,7 +70,8 @@ class Reflex(val from: Class<*>) {
             }.toMap(ConcurrentHashMap())
         }
         val method = map[name] ?: throw NoSuchMethodException("$name ($from)")
-        method.invoke(instance, parameter)
+        val obj = method.invoke(instance, parameter)
+        return if (obj != null) obj as T else null
     }
 
     companion object {
