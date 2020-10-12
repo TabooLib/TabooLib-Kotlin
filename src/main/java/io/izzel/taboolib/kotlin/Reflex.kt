@@ -70,7 +70,7 @@ class Reflex(val from: Class<*>) {
             }.toMap(ConcurrentHashMap())
         }
         val method = map[name] ?: throw NoSuchMethodException("$name ($from)")
-        val obj = method.invoke(instance, parameter)
+        val obj = if (parameter.isEmpty()) method.invoke(instance) else method.invoke(instance, *parameter)
         return if (obj != null) obj as T else null
     }
 
