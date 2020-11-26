@@ -50,12 +50,16 @@ class Demand(val source: String) {
         }
     }
 
-    inline fun <reified T> get(key: String, def: T? = null): T? {
-        return dataMap[key]?.let { if (it is T) it else def }
+    fun get(key: List<String>, def: String? = null): String? {
+        return key.mapNotNull { get(it) }.firstOrNull() ?: def
     }
 
-    inline fun <reified T> get(index: Int, def: T? = null): T? {
-        return args.getOrNull(index)?.let { if (it is T) it else def }
+    fun get(key: String, def: String? = null): String? {
+        return dataMap[key] ?: def
+    }
+
+    fun get(index: Int, def: String? = null): String? {
+        return args.getOrNull(index) ?: def
     }
 
     override fun toString(): String {
@@ -71,10 +75,5 @@ class Demand(val source: String) {
 
     override fun hashCode(): Int {
         return source.hashCode()
-    }
-
-    companion object {
-
-        fun of(source: String) = Demand(source)
     }
 }
