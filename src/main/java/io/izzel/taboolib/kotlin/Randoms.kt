@@ -1,6 +1,5 @@
 package io.izzel.taboolib.kotlin
 
-import io.izzel.taboolib.util.lite.Numbers
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ThreadLocalRandom
@@ -25,7 +24,7 @@ class Randoms<T>(vararg element: Pair<T, Int>) {
         val sum = value.sumBy { it.index }
         if (sum > 0) {
             var m = 0
-            val n = Numbers.getRandom().nextInt(sum)
+            val n = Random().nextInt(sum)
             for (obj in value) {
                 if (m <= n && n < m + obj.index) {
                     return obj.element

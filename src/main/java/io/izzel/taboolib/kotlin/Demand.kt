@@ -28,6 +28,7 @@ class Demand(val source: String) {
                         } else {
                             this.args.add(boxes.joinToString(" "))
                         }
+                        boxes.clear()
                     } else {
                         boxes.add(box)
                     }
