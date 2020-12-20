@@ -59,7 +59,7 @@ class Reflex(val from: Class<*>) {
                 it.isAccessible = true
                 it.name to it
             }.toMap(ConcurrentHashMap())
-        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) ($from)")
+        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
         val obj = Ref.getField(instance, field)
         return if (obj != null) obj as T else null
     }
@@ -71,7 +71,7 @@ class Reflex(val from: Class<*>) {
                 it.name to it
             }.toMap(ConcurrentHashMap())
         }
-        val obj = Ref.getField(instance, map[name] ?: throw NoSuchFieldException("$name ($from)"))
+        val obj = Ref.getField(instance, map[name] ?: throw NoSuchFieldException("$name at $from"))
         return if (obj != null) obj as T else null
     }
 
@@ -81,7 +81,7 @@ class Reflex(val from: Class<*>) {
                 it.isAccessible = true
                 it.name to it
             }.toMap(ConcurrentHashMap())
-        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) ($from)")
+        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
         Ref.putField(instance, field, value)
     }
 
@@ -92,25 +92,36 @@ class Reflex(val from: Class<*>) {
                 it.name to it
             }.toMap(ConcurrentHashMap())
         }
-        Ref.putField(instance, map[name] ?: throw NoSuchFieldException("$name ($from)"), value)
+        Ref.putField(instance, map[name] ?: throw NoSuchFieldException("$name at $from"), value)
     }
 
     fun <T> invoke(name: String, vararg parameter: Any?): T? {
         val map = cachedMethod.computeIfAbsent(from.name) {
-            Ref.getDeclaredMethods(from).map {
+            from.declaredMethods.map {
                 it.isAccessible = true
                 it.name to it
-            }.toMap(ConcurrentHashMap())
+            }
         }
-        val method = map[name] ?: throw NoSuchMethodException("$name ($from)")
-        val obj = if (parameter.isEmpty()) method.invoke(instance) else method.invoke(instance, *parameter)
+        val method = map.filter { it.first == name }.firstOrNull {
+            if (it.second.parameterCount == parameter.size) {
+                var checked = true
+                it.second.parameterTypes.forEachIndexed { index, p ->
+                    if (parameter[index] != null && parameter[index]!!.javaClass != p) {
+                        checked = false
+                    }
+                }
+                return@firstOrNull checked
+            }
+            return@firstOrNull false
+        } ?: throw NoSuchMethodException("$name(${parameter.joinToString(", ") { it?.javaClass?.simpleName ?: "null" }}) at $from")
+        val obj = method.second.invoke(instance, *parameter)
         return if (obj != null) obj as T else null
     }
 
     companion object {
 
         private val cachedField = Maps.newConcurrentMap<String, Map<String, Field>>()
-        private val cachedMethod = Maps.newConcurrentMap<String, Map<String, Method>>()
+        private val cachedMethod = Maps.newConcurrentMap<String, List<Pair<String, Method>>>()
 
         fun of(instance: Any): Reflex = Reflex(instance.javaClass).instance(instance)
 

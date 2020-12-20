@@ -20,8 +20,8 @@ class Demand(val source: String) {
             if (index > 0) {
                 if (isText) {
                     if (box.endsWith("\"") && !box.endsWith("\\\"")) {
-                        boxes.add(box.substring(0, box.length - 1))
                         isText = false
+                        boxes.add(box.substring(0, box.length - 1))
                         if (key != null) {
                             dataMap[key!!] = boxes.joinToString(" ").replace("\\\"", "\"")
                             key = null
@@ -34,8 +34,13 @@ class Demand(val source: String) {
                     }
                 } else {
                     if (box.startsWith("\"")) {
-                        boxes.add(box.substring(1))
-                        isText = true
+                        if (box.endsWith("\"") && !box.endsWith("\\\"")) {
+                            dataMap[key!!] = box.substring(1, box.length - 1).replace("\\\"", "\"")
+                            key = null
+                        } else {
+                            isText = true
+                            boxes.add(box.substring(1))
+                        }
                     } else {
                         if (box.startsWith("-") && key == null) {
                             key = box.substring(1)
