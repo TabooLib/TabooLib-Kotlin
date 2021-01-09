@@ -9,6 +9,7 @@ class Demand(val source: String) {
     val namespace: String
     val dataMap = HashMap<String, String>()
     val args = ArrayList<String>()
+    val tags = ArrayList<String>()
 
     init {
         val args = source.split(" ")
@@ -42,7 +43,9 @@ class Demand(val source: String) {
                             boxes.add(box.substring(1))
                         }
                     } else {
-                        if (box.startsWith("-") && key == null) {
+                        if (box.startsWith("--")) {
+                            tags.add(box.substring(2))
+                        } else if (box.startsWith("-") && key == null) {
                             key = box.substring(1)
                         } else if (key != null) {
                             dataMap[key!!] = box
@@ -69,17 +72,26 @@ class Demand(val source: String) {
     }
 
     override fun toString(): String {
-        return "Demand(source='$source', namespace='$namespace', dataMap=$dataMap, args=$args)"
+        return "Demand(source='$source', namespace='$namespace', dataMap=$dataMap, args=$args, tags=$tags)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Demand) return false
         if (source != other.source) return false
+        if (namespace != other.namespace) return false
+        if (dataMap != other.dataMap) return false
+        if (args != other.args) return false
+        if (tags != other.tags) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return source.hashCode()
+        var result = source.hashCode()
+        result = 31 * result + namespace.hashCode()
+        result = 31 * result + dataMap.hashCode()
+        result = 31 * result + args.hashCode()
+        result = 31 * result + tags.hashCode()
+        return result
     }
 }
