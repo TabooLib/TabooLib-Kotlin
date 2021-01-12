@@ -2,7 +2,10 @@ package io.izzel.taboolib.kotlin
 
 import com.google.gson.*
 import io.izzel.taboolib.module.db.local.SecuredFile
+import io.izzel.taboolib.module.nms.impl.Position
 import io.izzel.taboolib.util.item.Items
+import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -16,6 +19,7 @@ import java.util.*
 object Serializer {
 
     val gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().also {
+        it.registerTypeHierarchyAdapter(Location::class.java, TypeLocation())
         it.registerTypeHierarchyAdapter(ItemStack::class.java, TypeItemStack())
         it.registerTypeHierarchyAdapter(SecuredFile::class.java, TypeSecuredFile())
         it.registerTypeHierarchyAdapter(YamlConfiguration::class.java, TypeYamlConfiguration())
@@ -73,6 +77,31 @@ object Serializer {
                 }
             }
             return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())
+        }
+    }
+
+    class TypeLocation : JsonSerializer<Location>, JsonDeserializer<Location> {
+
+        override fun serialize(a: Location, p1: Type, p2: JsonSerializationContext): JsonElement {
+            return JsonObject().also {
+                it.addProperty("world", a.world!!.name)
+                it.addProperty("x", a.x)
+                it.addProperty("y", a.y)
+                it.addProperty("z", a.z)
+                it.addProperty("yaw", a.yaw)
+                it.addProperty("pitch", a.pitch)
+            }
+        }
+
+        override fun deserialize(a: JsonElement, p1: Type?, p2: JsonDeserializationContext): Location {
+            return Location(
+                Bukkit.getWorld(a.asJsonObject.get("world").asString),
+                a.asJsonObject.get("x").asDouble,
+                a.asJsonObject.get("y").asDouble,
+                a.asJsonObject.get("z").asDouble,
+                a.asJsonObject.get("yaw").asFloat,
+                a.asJsonObject.get("pitch").asFloat
+            )
         }
     }
 
