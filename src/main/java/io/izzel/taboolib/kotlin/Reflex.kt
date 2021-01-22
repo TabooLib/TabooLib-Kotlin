@@ -1,6 +1,5 @@
 package io.izzel.taboolib.kotlin
 
-import com.google.common.collect.Maps
 import io.izzel.taboolib.util.Ref
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -54,7 +53,7 @@ class Reflex(val from: Class<*>) {
     }
 
     fun <T> get(type: Class<T>, index: Int = 0): T? {
-        val field = cachedField.computeIfAbsent(from.name) {
+        val field = fieldMap.computeIfAbsent(from.name) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
@@ -65,7 +64,7 @@ class Reflex(val from: Class<*>) {
     }
 
     fun <T> get(name: String): T? {
-        val map = cachedField.computeIfAbsent(from.name) {
+        val map = fieldMap.computeIfAbsent(from.name) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
@@ -76,7 +75,7 @@ class Reflex(val from: Class<*>) {
     }
 
     fun set(type: Class<*>, value: Any?, index: Int = 0) {
-        val field = cachedField.computeIfAbsent(from.name) {
+        val field = fieldMap.computeIfAbsent(from.name) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
@@ -86,7 +85,7 @@ class Reflex(val from: Class<*>) {
     }
 
     fun set(name: String, value: Any?) {
-        val map = cachedField.computeIfAbsent(from.name) {
+        val map = fieldMap.computeIfAbsent(from.name) {
             Ref.getDeclaredFields(from).map {
                 it.isAccessible = true
                 it.name to it
@@ -96,7 +95,7 @@ class Reflex(val from: Class<*>) {
     }
 
     fun <T> invoke(name: String, vararg parameter: Any?): T? {
-        val map = cachedMethod.computeIfAbsent(from.name) {
+        val map = methodMap.computeIfAbsent(from.name) {
             from.declaredMethods.map {
                 it.isAccessible = true
                 it.name to it
@@ -120,13 +119,13 @@ class Reflex(val from: Class<*>) {
 
     companion object {
 
-        private val cachedField = Maps.newConcurrentMap<String, Map<String, Field>>()
-        private val cachedMethod = Maps.newConcurrentMap<String, List<Pair<String, Method>>>()
+        private val fieldMap = ConcurrentHashMap<String, Map<String, Field>>()
+        private val methodMap = ConcurrentHashMap<String, List<Pair<String, Method>>>()
 
         fun of(instance: Any): Reflex = Reflex(instance.javaClass).instance(instance)
 
-        fun from(clazz: Class<*>): Reflex = Reflex(clazz)
+        fun from(clazz: Class<*>) = Reflex(clazz)
 
-        fun from(clazz: Class<*>, instance: Any?): Reflex = Reflex(clazz).instance(instance)
+        fun from(clazz: Class<*>, instance: Any?) = Reflex(clazz).instance(instance)
     }
 }
