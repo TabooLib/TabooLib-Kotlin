@@ -137,7 +137,7 @@ object KetherX {
     }
 
     fun addAction(name: String, parser: QuestActionParser, namespace: String? = null) {
-        registry.registerAction(name, namespace ?: "ketherx", parser)
+        registry.registerAction(namespace ?: "ketherx", name, parser)
     }
 
     fun <T : Event> addEventOperator(name: String, event: KClass<out T>, func: EventOperator<T>.() -> Unit = {}) {
