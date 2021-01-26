@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets
  * @since 2021/1/26 3:26 下午
  */
 @Suppress("UnstableApiUsage")
-class Workspace(val file: File, val extension: String = "script", val namespace: List<String> = emptyList()) {
+class Workspace(val file: File, val extension: String = ".ks", val namespace: List<String> = emptyList()) {
 
     val scripts = HashMap<String, Quest>()
     val scriptsSetting = HashMap<String, Map<String, Any>>()
