@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.0-rc'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
 group = 'io.izzel.taboolib.kotlin'
-version = '1.0.11'
+version = '1.0.16'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -16,7 +17,18 @@ repositories {
 }
 
 dependencies {
-    compile 'ink.ptms.core:v11600:11600:all'
-    compile 'io.izzel.taboolib:TabooLib:5.44:all'
-    compile "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation 'ink.ptms.core:v11600:11600:all'
+    implementation 'io.izzel.taboolib:TabooLib:5.44:all'
+    implementation 'io.izzel.kether:KetherX:1.0.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation fileTree(dir: 'libs', includes: ['*.jar'])
+}
+
+
+shadowJar {
+    from(sourceSets.main.allSource)
+    dependencies {
+        it.include it.dependency('io.izzel.kether:.*')
+    }
+    relocate 'io.izzel.kether', 'io.izzel.taboolib.kotlin.ketherx'
 }

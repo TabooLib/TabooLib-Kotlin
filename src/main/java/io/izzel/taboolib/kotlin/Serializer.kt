@@ -2,7 +2,6 @@ package io.izzel.taboolib.kotlin
 
 import com.google.gson.*
 import io.izzel.taboolib.module.db.local.SecuredFile
-import io.izzel.taboolib.module.nms.impl.Position
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.Bukkit
 import org.bukkit.Location
