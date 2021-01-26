@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets
  * @since 2021/1/26 3:26 下午
  */
 @Suppress("UnstableApiUsage")
-class Workspace(val file: File, val extension: String = "script") {
+class Workspace(val file: File, val extension: String = "script", val namespace: List<String> = emptyList()) {
 
     val scripts = HashMap<String, Quest>()
     val scriptsSetting = HashMap<String, Map<String, Any>>()
@@ -93,7 +93,7 @@ class Workspace(val file: File, val extension: String = "script") {
                     val name = folder.relativize(path).toString().replace(File.separatorChar, '.')
                     if (name.endsWith(extension)) {
                         val bytes = Files.readFromFile(path.toFile())?.toByteArray(StandardCharsets.UTF_8) ?: ByteArray(0)
-                        scriptMap[name] = questLoader.load(ScriptService, TabooLib.getPlugin().logger, name, bytes)
+                        scriptMap[name] = questLoader.load(ScriptService, TabooLib.getPlugin().logger, name, bytes, namespace)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

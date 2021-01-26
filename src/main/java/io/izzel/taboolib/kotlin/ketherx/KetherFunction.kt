@@ -14,16 +14,22 @@ object KetherFunction {
     val scriptMap = HashMap<String, Quest>()
     val functionMap = HashMap<String, Function>()
 
-    fun parse(input: String, cacheFunction: Boolean = false, cacheScript: Boolean = true, context: ScriptContext.() -> Unit = {}): String {
+    fun parse(
+        input: String,
+        cacheFunction: Boolean = false,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        context: ScriptContext.() -> Unit = {}
+    ): String {
         val function = if (cacheFunction) this.functionMap.computeIfAbsent(input) {
             input.toFunction()
         } else {
             input.toFunction()
         }
         val script = if (cacheScript) this.scriptMap.computeIfAbsent(function.source) {
-            ScriptLoader.load(it)
+            ScriptLoader.load(it, namespace)
         } else {
-            ScriptLoader.load(function.source)
+            ScriptLoader.load(function.source, namespace)
         }
         val vars = ScriptContext.create(script).also(context).run {
             runActions()

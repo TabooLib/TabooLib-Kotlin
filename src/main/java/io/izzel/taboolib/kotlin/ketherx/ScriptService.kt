@@ -31,10 +31,6 @@ object ScriptService : QuestService<ScriptContext> {
     val workspace = HashMap<String, Workspace>()
     val mainspace = Workspace(File(TabooLib.getPlugin().dataFolder, "script"))
 
-    init {
-        workspace["TabooLib"] = mainspace
-    }
-
     @TSchedule
     fun loadAll() {
         workspace.values.forEach {

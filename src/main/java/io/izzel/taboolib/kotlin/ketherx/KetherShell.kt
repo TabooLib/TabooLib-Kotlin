@@ -7,15 +7,25 @@ object KetherShell {
 
     val scriptMap = HashMap<String, Quest>()
 
-    fun eval(source: List<String>, cacheScript: Boolean = true, context: ScriptContext.() -> Unit = {}): Any? {
-        return eval(source.joinToString("\n"), cacheScript, context)
+    fun eval(
+        source: List<String>,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        context: ScriptContext.() -> Unit = {}
+    ): Any? {
+        return eval(source.joinToString("\n"), cacheScript, namespace, context)
     }
 
-    fun eval(source: String, cacheScript: Boolean = true, context: ScriptContext.() -> Unit = {}): Any? {
+    fun eval(
+        source: String,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        context: ScriptContext.() -> Unit = {}
+    ): Any? {
         val script = if (cacheScript) this.scriptMap.computeIfAbsent(source) {
-            ScriptLoader.load(it)
+            ScriptLoader.load(it, namespace)
         } else {
-            ScriptLoader.load(source)
+            ScriptLoader.load(source, namespace)
         }
         return ScriptContext.create(script).also(context).runActions().get(1, TimeUnit.SECONDS)
     }

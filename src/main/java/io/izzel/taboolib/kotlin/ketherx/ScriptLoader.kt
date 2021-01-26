@@ -8,11 +8,11 @@ import java.util.*
 
 object ScriptLoader {
 
-    fun load(str: String): Quest {
-        return SimpleQuestLoader().load(ScriptService, Bukkit.getLogger(), "temp_${UUID.randomUUID()}", str.toByteArray(StandardCharsets.UTF_8))
+    fun load(str: String, namespace: List<String> = emptyList()): Quest {
+        return SimpleQuestLoader().load(ScriptService, Bukkit.getLogger(), "temp_${UUID.randomUUID()}", str.toByteArray(StandardCharsets.UTF_8), namespace)
     }
 
-    fun load(str: List<String>): Quest {
-        return load(str.joinToString("\n"))
+    fun load(str: List<String>, namespace: List<String> = emptyList()): Quest {
+        return load(str.joinToString("\n"), namespace)
     }
 }
