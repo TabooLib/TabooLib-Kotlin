@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.izzel.taboolib.kotlin'
-version = '1.0.21'
+version = '1.0.22'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -19,7 +19,7 @@ repositories {
 dependencies {
     implementation 'ink.ptms.core:v11600:11600:all'
     implementation 'io.izzel.taboolib:TabooLib:5.44:all'
-    implementation 'io.izzel.kether:KetherX:1.0.3'
+    implementation 'io.izzel.kether:common:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
@@ -30,5 +30,5 @@ shadowJar {
     dependencies {
         it.include it.dependency('io.izzel.kether:.*')
     }
-    relocate 'io.izzel.kether', 'io.izzel.taboolib.kotlin.ketherx'
+    relocate 'io.izzel.kether', 'io.izzel.taboolib.kotlin.kether'
 }
