@@ -23,8 +23,8 @@ import kotlin.reflect.KClass
 
 object Kether {
 
-    val registry = ScriptService.registry.also {
-        KetherTypes.registerInternals(it, ScriptService)
+    val registry = ScriptService.INSTANCE.registry.also {
+        KetherTypes.registerInternals(it, ScriptService.INSTANCE)
     }
 
     var storage: QuestStorage? = null
@@ -33,6 +33,7 @@ object Kether {
     val operatorMap = ConcurrentHashMap<String, EventOperator<out Event>>()
 
     @TFunction.Init
+    @JvmStatic
     fun init() {
         addAction("check", ActionCheck.parser())
         addAction("function", ActionFunction.parser())
@@ -113,7 +114,7 @@ object Kether {
                     sender.sendMessage("§8[§fTabooLib§8] §7Usage: §8/tkether function [text]")
                 } else if (args[0] == "shell" && args.size > 1) {
                     val time = System.currentTimeMillis()
-                    ScriptContext.create(ScriptLoader.load(join(args, 1, " "))) {
+                    ScriptContext.create(ScriptLoader.load("def main = { ${join(args, 1, " ")} }")) {
                         this.sender = sender
                     }.runActions().thenAccept {
                         sender.sendMessage("§8[§fTabooLib§8] §7Execution result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
@@ -131,9 +132,10 @@ object Kether {
     }
 
     @TSchedule
+    @JvmStatic
     fun tick() {
         try {
-            storage = LocalYamlStorage(ScriptService, Files.folder(TabooLib.getPlugin().dataFolder, "temp").toPath())
+            storage = LocalYamlStorage(ScriptService.INSTANCE, Files.folder(TabooLib.getPlugin().dataFolder, "temp").toPath())
             storage!!.init()
         } catch (e: Exception) {
             println("[TabooLib] Script data storage initialization failed")

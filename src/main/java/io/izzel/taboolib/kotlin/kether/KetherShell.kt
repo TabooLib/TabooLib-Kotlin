@@ -22,10 +22,11 @@ object KetherShell {
         namespace: List<String> = emptyList(),
         context: ScriptContext.() -> Unit = {}
     ): Any? {
-        val script = if (cacheScript) this.scriptMap.computeIfAbsent(source) {
+        val s = "def main = { $source }"
+        val script = if (cacheScript) this.scriptMap.computeIfAbsent(s) {
             ScriptLoader.load(it, namespace)
         } else {
-            ScriptLoader.load(source, namespace)
+            ScriptLoader.load(s, namespace)
         }
         return ScriptContext.create(script).also(context).runActions().get(1, TimeUnit.SECONDS)
     }

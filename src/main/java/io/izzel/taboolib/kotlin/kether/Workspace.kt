@@ -36,11 +36,11 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
         loadSettings()
 
         scripts.forEach {
-            if (Coerce.toBoolean(ScriptService.getQuestSettings(it.value.id)["autostart"])) {
-                ScriptService.startQuest(ScriptContext.create(it.value))
+            if (Coerce.toBoolean(ScriptService.INSTANCE.getQuestSettings(it.value.id)["autostart"])) {
+                ScriptService.INSTANCE.startQuest(ScriptContext.create(it.value))
                 return@forEach
             }
-            val trigger = ScriptService.getQuestSettings(it.value.id)["start"] ?: return@forEach
+            val trigger = ScriptService.INSTANCE.getQuestSettings(it.value.id)["start"] ?: return@forEach
             val operator = Kether.getEventOperator(trigger.toString())
             if (operator == null) {
                 println("[TabooLib] Unknown starting trigger $trigger")
@@ -92,7 +92,7 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
                     val name = folder.relativize(path).toString().replace(File.separatorChar, '.')
                     if (name.endsWith(extension)) {
                         val bytes = Files.readFromFile(path.toFile())?.toByteArray(StandardCharsets.UTF_8) ?: ByteArray(0)
-                        scriptMap[name] = questLoader.load(ScriptService, Bukkit.getLogger(), name, bytes, namespace)
+                        scriptMap[name] = questLoader.load(ScriptService.INSTANCE, Bukkit.getLogger(), name, bytes, namespace)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -115,7 +115,7 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
         runningScripts.put(id, context)
         context.runActions().thenRunAsync({
             runningScripts.remove(id, context)
-        }, ScriptService.executor)
+        }, ScriptService.INSTANCE.executor)
     }
 
     fun terminateScript(context: ScriptContext) {

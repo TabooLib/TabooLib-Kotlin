@@ -36,13 +36,13 @@ class ActionForEach(val key: String, val values: ParsedAction<*>, val action: Pa
 
     fun process(frame: QuestContext.Frame, future: CompletableFuture<Void>, cur: Int, i: List<Any>) {
         if (cur < i.size) {
+            val e = i[cur]
+            if (e is Pair<*, *>) {
+                frame.variables()["$key-key"] = e.first
+                frame.variables()["$key-value"] = e.second
+            }
+            frame.variables()[key] = e
             frame.newFrame(action).run<Any>().thenRunAsync({
-                val e = i[cur]
-                if (e is Pair<*, *>) {
-                    frame.variables()["$key-key"] = e.first
-                    frame.variables()["$key-value"] = e.second
-                }
-                frame.variables()[key] = e
                 process(frame, future, cur + 1, i)
             }, frame.context().executor)
         } else {

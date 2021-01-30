@@ -21,10 +21,11 @@ object KetherFunction {
         namespace: List<String> = emptyList(),
         context: ScriptContext.() -> Unit = {}
     ): String {
-        val function = if (cacheFunction) this.functionMap.computeIfAbsent(input) {
-            input.toFunction()
+        val s = "def main = { $input }"
+        val function = if (cacheFunction) this.functionMap.computeIfAbsent(s) {
+            s.toFunction()
         } else {
-            input.toFunction()
+            s.toFunction()
         }
         val script = if (cacheScript) this.scriptMap.computeIfAbsent(function.source) {
             ScriptLoader.load(it, namespace)

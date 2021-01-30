@@ -17,9 +17,9 @@ class ActionLog(val message: ParsedAction<*>) : QuestAction<Void>() {
         return context.newFrame(message).run<Any>().thenAccept {
             if (context.context() is ScriptContext) {
                 val player = (context.context() as ScriptContext).sender?.name.toString()
-                println("[Adyeshach] ${it.toString().trimIndent().replace("@sender", player)}")
+                println(it.toString().trimIndent().replace("@sender", player))
             } else {
-                println("[Adyeshach] ${it.toString().trimIndent()}")
+                println(it.toString().trimIndent())
             }
         }
     }
