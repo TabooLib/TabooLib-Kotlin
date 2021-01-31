@@ -13,9 +13,20 @@ import java.util.concurrent.CompletableFuture
 class ActionJoin(val source: List<ParsedAction<*>>, val separator: String) : QuestAction<String>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<String> {
-        return CompletableFuture.completedFuture(source.joinToString(separator) {
-            context.newFrame(it).run<Any>().toString()
-        })
+        val future = CompletableFuture<String>()
+        process(context, future, 0, source, ArrayList())
+        return future;
+    }
+
+    fun process(frame: QuestContext.Frame, future: CompletableFuture<String>, cur: Int, i: List<ParsedAction<*>>, array: ArrayList<Any>) {
+        if (cur < i.size) {
+            frame.newFrame(i[cur]).run<Any>().thenAcceptAsync({
+                array.add(it)
+                process(frame, future, cur + 1, i, array)
+            }, frame.context().executor)
+        } else {
+            future.complete(array.joinToString(separator))
+        }
     }
 
     override fun toString(): String {

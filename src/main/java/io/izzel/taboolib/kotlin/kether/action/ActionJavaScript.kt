@@ -6,6 +6,7 @@ import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.event.EventNormal
 import io.izzel.taboolib.util.Features
+import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
 import javax.script.CompiledScript
 import javax.script.SimpleBindings
@@ -24,6 +25,7 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
                         hashMapOf(
                             "event" to s.event,
                             "sender" to s.sender,
+                            "server" to Bukkit.getServer(),
                             "variables" to context.variables().values().map { it.key to it.value }.toMap(),
                         ), s
                     ).bindings

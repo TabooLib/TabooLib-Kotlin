@@ -110,23 +110,32 @@ object Kether {
         }
         CommandBuilder.create("tkether", TabooLib.getPlugin())
             .permission("*")
+            .aliases("tk")
             .execute { sender, args ->
                 if (args.isEmpty()) {
                     sender.sendMessage("§8[§fTabooLib§8] §7Usage: §8/tkether shell [shell]")
                     sender.sendMessage("§8[§fTabooLib§8] §7Usage: §8/tkether function [text]")
                 } else if (args[0] == "shell" && args.size > 1) {
                     val time = System.currentTimeMillis()
-                    ScriptContext.create(ScriptLoader.load("def main = { ${join(args, 1, " ")} }")) {
-                        this.sender = sender
-                    }.runActions().thenAccept {
-                        sender.sendMessage("§8[§fTabooLib§8] §7Execution result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
+                    try {
+                        ScriptContext.create(ScriptLoader.load("def main = { ${join(args, 1, " ")} }")) {
+                            this.sender = sender
+                        }.runActions().thenAccept {
+                            sender.sendMessage("§8[§fTabooLib§8] §7Execution result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
+                        }
+                    } catch (e: Exception) {
+                        sender.sendMessage("§8[§fTabooLib§8] §7Error: §f${e.message}")
                     }
                 } else if (args[0] == "function") {
                     val time = System.currentTimeMillis()
-                    val r = KetherFunction.parse(join(args, 1, " "), cacheFunction = false, cacheScript = false) {
-                        this.sender = sender
+                    try {
+                        val r = KetherFunction.parse(join(args, 1, " "), cacheFunction = false, cacheScript = false) {
+                            this.sender = sender
+                        }
+                        sender.sendMessage("§8[§fTabooLib§8] §7Function parsed: §f\"${r}\" §8(${System.currentTimeMillis() - time}ms)")
+                    } catch (e: Exception) {
+                        sender.sendMessage("§8[§fTabooLib§8] §7Error: §f${e.message}")
                     }
-                    sender.sendMessage("§8[§fTabooLib§8] §7Function parsed: §f\"${r}\" §8(${System.currentTimeMillis() - time}ms)")
                 } else {
                     sender.sendMessage("§8[§fTabooLib§8] §7Oops!")
                 }

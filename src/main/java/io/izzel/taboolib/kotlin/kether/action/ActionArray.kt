@@ -17,7 +17,20 @@ import java.util.concurrent.CompletableFuture
 class ActionArray(val list: List<ParsedAction<*>>) : QuestAction<List<Any>>() {
 
     override fun process(frame: QuestContext.Frame): CompletableFuture<List<Any>> {
-        return CompletableFuture.completedFuture(list.map { frame.newFrame(it).run<Any>() }.toList())
+        val future = CompletableFuture<List<Any>>()
+        process(frame, future, 0, list, ArrayList())
+        return future
+    }
+
+    fun process(frame: QuestContext.Frame, future: CompletableFuture<List<Any>>, cur: Int, i: List<ParsedAction<*>>, array: ArrayList<Any>) {
+        if (cur < i.size) {
+            frame.newFrame(i[cur]).run<Any>().thenAcceptAsync({
+                array.add(it)
+                process(frame, future, cur + 1, i, array)
+            }, frame.context().executor)
+        } else {
+            future.complete(array)
+        }
     }
 
     override fun toString(): String {

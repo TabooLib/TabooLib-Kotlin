@@ -18,11 +18,11 @@ import java.util.concurrent.CompletableFuture
 class ActionSender : QuestAction<String>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<String> {
-        val sender = (context as ScriptContext).sender
-        if (sender is ConsoleCommandSender) {
-            return CompletableFuture.completedFuture("console")
+        val sender = (context.context() as ScriptContext).sender
+        return if (sender is ConsoleCommandSender) {
+            CompletableFuture.completedFuture("console")
         } else {
-            return CompletableFuture.completedFuture(sender?.name ?: "null")
+            CompletableFuture.completedFuture(sender?.name ?: "null")
         }
     }
 
