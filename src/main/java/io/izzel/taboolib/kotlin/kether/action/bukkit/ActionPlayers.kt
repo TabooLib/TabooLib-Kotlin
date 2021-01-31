@@ -13,10 +13,10 @@ import java.util.concurrent.CompletableFuture
 /**
  * @author IzzelAliz
  */
-class ActionPlayers() : QuestAction<List<Player>>() {
+class ActionPlayers() : QuestAction<List<String>>() {
 
-    override fun process(context: QuestContext.Frame): CompletableFuture<List<Player>> {
-        return CompletableFuture.completedFuture(Bukkit.getOnlinePlayers().toList())
+    override fun process(context: QuestContext.Frame): CompletableFuture<List<String>> {
+        return CompletableFuture.completedFuture(Bukkit.getOnlinePlayers().map { it.name }.toList())
     }
 
     override fun toString(): String {
