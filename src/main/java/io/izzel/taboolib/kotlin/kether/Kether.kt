@@ -60,6 +60,8 @@ object Kether {
         addAction("subtitle", ActionSubtitle.parser())
         addAction("actionbar", ActionAction.parser())
         addAction("players", ActionPlayers.parser())
+        addAction("sender", ActionSender.parser())
+        addAction("switch", ActionSwitch.parser())
         addAction(arrayOf("papi", "placeholder"), ActionPlaceholder.parser())
         // events
         addEventOperator("join", PlayerJoinEvent::class) {
