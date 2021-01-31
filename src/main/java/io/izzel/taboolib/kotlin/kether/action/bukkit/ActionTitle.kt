@@ -37,6 +37,7 @@ class ActionTitle(val title: ParsedAction<*>, val subTitle: ParsedAction<*>, val
         @Suppress("UnstableApiUsage")
         fun parser() = ScriptParser.parser {
             val title = it.next(ArgTypes.ACTION)
+            it.expect("subtitle")
             val subTitle = it.next(ArgTypes.ACTION)
             var fadeIn = 0
             var stay = 20
