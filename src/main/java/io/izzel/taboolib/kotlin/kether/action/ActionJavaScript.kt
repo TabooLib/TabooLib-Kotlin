@@ -18,7 +18,7 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Any> {
         val s = (context.context() as ScriptContext)
-        return CompletableFuture.completedFuture(
+        val r = try {
             script.eval(
                 SimpleBindings(
                     Event(
@@ -26,16 +26,26 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
                             "event" to s.event,
                             "sender" to s.sender,
                             "server" to Bukkit.getServer(),
-                            "variables" to context.variables().values().map { it.key to it.value }.toMap(),
-                        ), s
+                        ).also {
+                            val vars = ArrayList<String>()
+                            var p = context.parent()
+                            while (p.isPresent) {
+                                vars.addAll(p.get().variables().keys())
+                                p = p.get().parent()
+                            }
+                            it.putAll(vars.map { i -> i to context.variables().get<Any>(i).orElse(null) })
+                        }, s
                     ).bindings
                 )
             )
-        )
+        } catch (e: Exception) {
+            println(e.localizedMessage)
+        }
+        return CompletableFuture.completedFuture(r)
     }
 
     override fun toString(): String {
-        return "ActionJs(script=$script)"
+        return "ActionJavaScript(script=$script)"
     }
 
     class Event(val bindings: MutableMap<String, Any?>, val context: ScriptContext) : EventNormal<Event>()

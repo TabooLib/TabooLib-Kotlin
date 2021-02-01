@@ -70,11 +70,7 @@ class ScriptService : QuestService<ScriptContext> {
     }
 
     override fun getLocalizedText(node: String, vararg params: Any): String {
-        return Strings.replaceWithOrder(locale.getString(node, node), *params)
-    }
-
-    override fun getStorage(): QuestStorage {
-        return Kether.storage!!
+        return Strings.replaceWithOrder(locale.getString(node, "<ERROR:${node}>:${params.joinToString(",") { it.toString() }}"), *params)
     }
 
     override fun startQuest(context: ScriptContext) {

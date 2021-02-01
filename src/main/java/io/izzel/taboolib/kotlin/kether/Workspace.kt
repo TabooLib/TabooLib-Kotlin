@@ -92,7 +92,7 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
                     val name = folder.relativize(path).toString().replace(File.separatorChar, '.')
                     if (name.endsWith(extension)) {
                         val bytes = Files.readFromFile(path.toFile())?.toByteArray(StandardCharsets.UTF_8) ?: ByteArray(0)
-                        scriptMap[name] = questLoader.load(ScriptService.INSTANCE, Bukkit.getLogger(), name, bytes, namespace)
+                        scriptMap[name] = questLoader.load(ScriptService.INSTANCE, name, bytes, namespace)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

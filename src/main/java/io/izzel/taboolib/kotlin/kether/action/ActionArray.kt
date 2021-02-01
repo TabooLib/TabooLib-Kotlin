@@ -40,7 +40,7 @@ class ActionArray(val list: List<ParsedAction<*>>) : QuestAction<List<Any>>() {
     companion object {
 
         /**
-         * set a to array [  ]
+         * set a to array [ *1 *2 *3 ]
          */
         fun parser() = ScriptParser.parser {
             ActionArray(it.next(ArgTypes.listOf(ArgTypes.ACTION)))

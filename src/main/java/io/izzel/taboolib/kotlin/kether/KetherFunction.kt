@@ -1,8 +1,10 @@
 package io.izzel.taboolib.kotlin.kether
 
 import io.izzel.kether.common.api.Quest
+import io.izzel.kether.common.util.LocalizedException
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.jvm.Throws
 
 /**
  * your health {{player health}}, your name {{player name}}
@@ -14,6 +16,7 @@ object KetherFunction {
     val scriptMap = HashMap<String, Quest>()
     val functionMap = HashMap<String, Function>()
 
+    @Throws(LocalizedException::class)
     fun parse(
         input: String,
         cacheFunction: Boolean = false,
