@@ -19,7 +19,7 @@ repositories {
 dependencies {
     implementation 'ink.ptms.core:v11600:11600:all'
     implementation 'io.izzel.taboolib:TabooLib:5.44:all'
-//    implementation 'io.izzel.kether:common:1.0.7'
+    implementation 'io.izzel.kether:common:1.0.8'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
@@ -31,8 +31,8 @@ shadowJar {
         exclude 'META-INF/*'
     }
     dependencies {
-//        it.include it.dependency('io.izzel.kether:.*')
-        it.exclude it.dependency('.*:.*')
+        it.include it.dependency('io.izzel.kether:.*')
+//        it.exclude it.dependency('.*:.*')
     }
     relocate 'io.izzel.kether', 'io.izzel.taboolib.kotlin.kether'
 }
