@@ -9,11 +9,13 @@ import io.izzel.taboolib.kotlin.kether.action.bukkit.*
 import io.izzel.taboolib.module.command.lite.CommandBuilder
 import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.util.Coerce
+import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerCommandPreprocessEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import java.lang.NullPointerException
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 
@@ -23,43 +25,58 @@ object Kether {
         KetherTypes.registerInternals(it, ScriptService.INSTANCE)
     }
 
-    val operatorMap = ConcurrentHashMap<String, EventOperator<out Event>>()
+    val operatorsEvent = LinkedHashMap<String, EventOperator<out Event>>()
+    val operatorsPlayer = LinkedHashMap<String, PlayerOperator>()
 
     @TFunction.Init
     @JvmStatic
     fun init() {
+        // logic
         addAction("run", ActionRun.parser())
-        addAction("for", ActionForEach.parser())
+        addAction("for", ActionFor.parser())
         addAction("map", ActionMap.parser())
-        addAction("pass", ActionPass.parser())
-        addAction("join", ActionJoin.parser())
         addAction("check", ActionCheck.parser())
         addAction("pause", ActionPause.parser())
-        addAction("array", ActionArray.parser())
-        addAction("range", ActionRange.parser())
-        addAction("random", ActionRandom.parser())
-        addAction("variables", ActionVariables.parser())
+
+        // base action (no result)
         addAction(arrayOf("log", "print"), ActionLog.parser())
         addAction(arrayOf("wait", "sleep"), ActionWait.parser())
         addAction(arrayOf("exit", "terminate"), ActionTerminate.parser())
+
+        // base function (have result)
+        addAction("null", ActionNull.parser())
+        addAction("pass", ActionPass.parser())
+        addAction("join", ActionJoin.parser())
+        addAction("array", ActionArray.parser())
+        addAction("range", ActionRange.parser())
+        addAction("random", ActionRandom.parser())
+        addAction(arrayOf("vars", "variables"), ActionVariables.parser())
         addAction(arrayOf("inline", "function"), ActionFunction.parser())
         addAction(arrayOf("$", "js", "javascript"), ActionJavaScript.parser())
-        // bukkit
-        addAction("tell", ActionTell.parser())
-        addAction("color", ActionColor.parser())
-        addAction("title", ActionTitle.parser())
-        addAction("sound", ActionSound.parser())
+
+        // bukkit logic
         addAction("event", ActionEvent.parser())
-        addAction("sender", ActionSender.parser())
-        addAction("switch", ActionSwitch.parser())
         addAction("listen", ActionListen.parser())
-        addAction("players", ActionPlayers.parser())
-        addAction("command", ActionCommand.parser())
         addAction("continue", ActionContinue.parser())
+
+        // bukkit action
+        addAction("switch", ActionSwitch.parser())
+        addAction("tell", ActionTell.parser())
+        addAction("command", ActionCommand.parser())
+        addAction("title", ActionTitle.parser())
         addAction("subtitle", ActionSubtitle.parser())
         addAction("actionbar", ActionActionBar.parser())
+        addAction("sound", ActionSound.parser())
+
+        // bukkit function
+        addAction("color", ActionColor.parser())
+        addAction("sender", ActionSender.parser())
+        addAction("player", ActionPlayer.parser())
+        addAction("players", ActionPlayers.parser())
+        addAction("location", ActionLocation.parser())
         addAction(arrayOf("perm", "permission"), ActionPermission.parser())
         addAction(arrayOf("papi", "placeholder"), ActionPlaceholder.parser())
+
         // events
         addEventOperator("join", PlayerJoinEvent::class) {
             unit("player") {
@@ -112,18 +129,30 @@ object Kether {
                 if (args.isEmpty()) {
                     sender.sendMessage("§8[§fTabooLib§8] §7Usage: §8/tkether shell [shell]")
                     sender.sendMessage("§8[§fTabooLib§8] §7Usage: §8/tkether inline [text]")
-                } else if (args[0] == "shell" && args.size > 1) {
-                    val time = System.currentTimeMillis()
-                    try {
-                        ScriptContext.create(ScriptLoader.load("def main = { ${join(args, 1, " ")} }")) {
-                            this.sender = sender
-                        }.runActions().thenAccept {
-                            sender.sendMessage("§8[§fTabooLib§8] §7Result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
+                } else if (args[0] == "shell") {
+                    when {
+                        args.size > 1 -> {
+                            val time = System.currentTimeMillis()
+                            try {
+                                ScriptContext.create(ScriptLoader.load("def main = { ${join(args, 1, " ")} }")) {
+                                    this.sender = sender
+                                }.runActions().thenAccept {
+                                    sender.sendMessage("§8[§fTabooLib§8] §7Result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
+                                }
+                            } catch (e: NullPointerException) {
+                                e.printStackTrace()
+                            } catch (e: Exception) {
+                                sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing kether shell:")
+                                e.localizedMessage?.split("\n")?.forEach {
+                                    sender.sendMessage("§8[§fTabooLib§8] §8${it}")
+                                }
+                            }
                         }
-                    } catch (e: Exception) {
-                        sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing kether shell:")
-                        e.localizedMessage?.split("\n")?.forEach {
-                            sender.sendMessage("§8[§fTabooLib§8] §8${it}")
+                        sender is Player -> {
+                            KetherTerminal.open(sender)
+                        }
+                        else -> {
+                            sender.sendMessage("§8[§fTabooLib§8] §7Oops!")
                         }
                     }
                 } else if (args[0] == "inline") {
@@ -133,6 +162,8 @@ object Kether {
                             this.sender = sender
                         }
                         sender.sendMessage("§8[§fTabooLib§8] §7Result: §f\"${r}\" §8(${System.currentTimeMillis() - time}ms)")
+                    } catch (e: NullPointerException) {
+                        e.printStackTrace()
                     } catch (e: Exception) {
                         sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing inline script:")
                         e.localizedMessage?.split("\n")?.forEach {
@@ -153,11 +184,15 @@ object Kether {
         registry.registerAction(namespace ?: "kether", name, parser)
     }
 
+    fun addPlayerOperator(name: String, operator: PlayerOperator) {
+        operatorsPlayer[name] = operator
+    }
+
     fun <T : Event> addEventOperator(name: String, event: KClass<out T>, func: EventOperator<T>.() -> Unit = {}) {
-        operatorMap[name] = EventOperator(event).also(func)
+        operatorsEvent[name] = EventOperator(event).also(func)
     }
 
     fun getEventOperator(name: String): EventOperator<out Event>? {
-        return operatorMap.entries.firstOrNull { it.key.equals(name, true) }?.value
+        return operatorsEvent.entries.firstOrNull { it.key.equals(name, true) }?.value
     }
 }

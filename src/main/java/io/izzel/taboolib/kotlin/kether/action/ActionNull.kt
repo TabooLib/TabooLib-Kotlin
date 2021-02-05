@@ -11,20 +11,20 @@ import java.util.concurrent.CompletableFuture
 /**
  * @author IzzelAliz
  */
-class ActionPass : QuestAction<String>() {
+class ActionNull : QuestAction<Any?>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
-        return CompletableFuture.completedFuture("")
+    override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
+        return CompletableFuture.completedFuture(null)
     }
 
     override fun toString(): String {
-        return "ActionPass()"
+        return "ActionNull()"
     }
 
     companion object {
 
         fun parser() = ScriptParser.parser {
-            ActionPass()
+            ActionNull()
         }
     }
 }

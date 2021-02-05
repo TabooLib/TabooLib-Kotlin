@@ -11,7 +11,7 @@ import java.util.*
  * @Author 坏黑
  * @Since 2018-12-24 16:32
  */
-object Mirror {
+class Mirror {
 
     val dataMap = Maps.newConcurrentMap<String, MirrorData>()!!
 
@@ -31,11 +31,11 @@ object Mirror {
 
     fun collect(opt: Options.() -> Unit = {}): MirrorCollect {
         val options = Options().also(opt)
-        val collect = MirrorCollect(options, "/", "/")
+        val collect = MirrorCollect(this, options, "/", "/")
         dataMap.entries.forEach { mirror ->
             var point = collect
             mirror.key.split(":").forEach {
-                point = point.sub.computeIfAbsent(it) { _ -> MirrorCollect(options, mirror.key, it) }
+                point = point.sub.computeIfAbsent(it) { _ -> MirrorCollect(this, options, mirror.key, it) }
             }
         }
         return collect
@@ -47,10 +47,16 @@ object Mirror {
         var parentFormat = "§c[TabooLib] §8{0}§7{1} §8[{2} ms] §c[{3} ms] §7{4}%"
     }
 
-    class MirrorCollect(val opt: Options, val key: String, val path: String, val sub: MutableMap<String, MirrorCollect> = TreeMap()) {
+    class MirrorCollect(
+        val mirror: Mirror,
+        val opt: Options,
+        val key: String,
+        val path: String,
+        val sub: MutableMap<String, MirrorCollect> = TreeMap()
+    ) {
 
         fun getTotal(): BigDecimal {
-            var total = dataMap[key]?.timeTotal ?: BigDecimal.ZERO
+            var total = mirror.dataMap[key]?.timeTotal ?: BigDecimal.ZERO
             sub.values.forEach {
                 total = total.add(it.getTotal())
             }
@@ -60,7 +66,7 @@ object Mirror {
         fun print(sender: CommandSender, all: BigDecimal, space: Int) {
             val spaceStr = (1..space).joinToString("") { "···" }
             val total = getTotal()
-            val avg = dataMap[key]?.getAverage() ?: 0.0
+            val avg = mirror.dataMap[key]?.getAverage() ?: 0.0
             val message = Strings.replaceWithOrder(if (sub.isEmpty()) opt.childFormat else opt.parentFormat, spaceStr, path, total, avg, percent(all, total))
             sender.sendMessage(message)
             sub.values.map {

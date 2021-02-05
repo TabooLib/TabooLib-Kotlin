@@ -69,7 +69,7 @@ class MirrorData {
     }
 
     fun getAverage(): Double {
-        return timeTotal.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP).toDouble()
+        return if (count == 0L) 0.0 else timeTotal.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP).toDouble()
     }
 
     override fun toString(): String {

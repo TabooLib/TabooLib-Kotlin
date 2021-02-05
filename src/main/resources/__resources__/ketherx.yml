@@ -6,7 +6,7 @@ load-error:
   unknown-action: 'Unknown action {0}'
   not-match: 'Should be entered {0} is actually {1}'
   require-async: 'This action cannot be used in require: {0}'
-  string-not-close: "The string has no matching end (\")"
+  string-not-close: "The string has no matching end (\" x {0})"
   not-integer: '{0} is not integer'
   not-long: '{0} is not long'
   not-double: '{0} is not double'

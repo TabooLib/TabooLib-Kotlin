@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * @author IzzelAliz
  */
-class ActionForEach(val key: String, val values: ParsedAction<*>, val action: ParsedAction<*>) : QuestAction<Void>() {
+class ActionFor(val key: String, val values: ParsedAction<*>, val action: ParsedAction<*>) : QuestAction<Void>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
@@ -50,7 +50,7 @@ class ActionForEach(val key: String, val values: ParsedAction<*>, val action: Pa
          * for i in range 1 to 10 then {  }
          */
         fun parser() = ScriptParser.parser {
-            ActionForEach(it.nextToken(), it.run {
+            ActionFor(it.nextToken(), it.run {
                 expect("in")
                 next(ArgTypes.ACTION)
             }, it.run {

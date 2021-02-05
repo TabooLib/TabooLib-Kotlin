@@ -30,18 +30,16 @@ class ActionMap(val key: String, val values: ParsedAction<*>, val action: Parsed
         return future;
     }
 
-    fun process(frame: QuestContext.Frame, future: CompletableFuture<List<Any>>, cur: Int, i: List<Any>, r: MutableList<Any> = ArrayList()) {
+    fun process(frame: QuestContext.Frame, future: CompletableFuture<List<Any>>, cur: Int, i: List<Any>, result: MutableList<Any> = ArrayList()) {
         if (cur < i.size) {
             frame.variables()[key] = i[cur]
-            frame.newFrame(action).run<Any>().thenRunAsync({
-                frame.variables().get<Any>(key).ifPresent {
-                    r.add(it)
-                }
-                process(frame, future, cur + 1, i)
+            frame.newFrame(action).run<Any>().thenAcceptAsync({
+                it?.let { result.add(it) }
+                process(frame, future, cur + 1, i, result)
             }, frame.context().executor)
         } else {
             frame.variables().remove(key)
-            future.complete(r)
+            future.complete(result)
         }
     }
 

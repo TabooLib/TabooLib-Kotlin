@@ -95,7 +95,10 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
                         scriptMap[name] = questLoader.load(ScriptService.INSTANCE, name, bytes, namespace)
                     }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    println("[TabooLib] Unexpected exception while parsing kether script:")
+                    e.localizedMessage?.split("\n")?.forEach {
+                        println("[TabooLib] $it")
+                    }
                 }
             }
         }
