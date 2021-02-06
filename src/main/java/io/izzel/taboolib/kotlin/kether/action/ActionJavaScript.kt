@@ -2,6 +2,7 @@ package io.izzel.taboolib.kotlin.kether.action
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.event.EventNormal
@@ -52,6 +53,7 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
 
     companion object {
 
+        @KetherParser(["$", "js", "javascript"])
         fun parser() = ScriptParser.parser {
             ActionJavaScript(Features.compileScript(it.nextToken().trimIndent())!!)
         }

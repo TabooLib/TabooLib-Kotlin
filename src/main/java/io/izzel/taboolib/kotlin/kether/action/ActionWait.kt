@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.Tasks
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -30,6 +31,7 @@ class ActionWait(val ticks: Long) : QuestAction<Void>() {
 
     companion object {
 
+        @KetherParser(["wait", "delay", "sleep"])
         fun parser() = ScriptParser.parser {
             ActionWait(it.next(ArgTypes.DURATION).toMillis() / 50L)
         }

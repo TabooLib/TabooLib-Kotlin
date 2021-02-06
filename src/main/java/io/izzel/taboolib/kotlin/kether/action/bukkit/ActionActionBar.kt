@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.locale.TLocale
@@ -28,7 +29,7 @@ class ActionActionBar(val message: ParsedAction<*>) : QuestAction<Void>() {
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["actionbar"])
         fun parser() = ScriptParser.parser {
             ActionActionBar(it.next(ArgTypes.ACTION))
         }

@@ -5,6 +5,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.util.Coerce
@@ -61,7 +62,7 @@ class ActionLocation(
         /**
          * location 10 20 10 and 0 0
          */
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["loc", "location"])
         fun parser() = ScriptParser.parser {
             val world = it.next(ArgTypes.ACTION)
             val x = it.next(ArgTypes.ACTION)

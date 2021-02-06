@@ -3,6 +3,8 @@ package io.izzel.taboolib.kotlin.kether.action.bukkit
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.taboolib.internal.xseries.XSound
+import io.izzel.taboolib.kotlin.kether.Kether.expects
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import org.bukkit.entity.Player
@@ -31,13 +33,17 @@ class ActionSound(val sound: String, val volume: Float, val pitch: Float) : Ques
 
     companion object {
 
+        /**
+         * sound block_stone_break by 1 1
+         */
+        @KetherParser(["sound"])
         fun parser() = ScriptParser.parser {
             val sound = it.nextToken()
             var volume = 1.0f
             var pitch = 1.0f
             it.mark()
             try {
-                it.expect("by")
+                it.expects("by", "with")
                 volume = it.nextDouble().toFloat()
                 pitch = it.nextDouble().toFloat()
             } catch (ignored: Exception) {

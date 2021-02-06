@@ -4,6 +4,8 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.Kether.expects
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -35,13 +37,17 @@ class ActionJoin(val source: List<ParsedAction<*>>, val separator: String) : Que
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        /**
+         * join [ *1 *2 *3 ] by -
+         * join [ *a *b *c ] with -
+         */
+        @KetherParser(["join"])
         fun parser() = ScriptParser.parser {
             val source = it.next(ArgTypes.listOf(ArgTypes.ACTION))
             it.mark()
             ActionJoin(
                 source, try {
-                    it.expect("by")
+                    it.expects("by", "with")
                     it.nextToken()
                 } catch (ignored: Exception) {
                     it.reset()

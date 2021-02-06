@@ -6,27 +6,31 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
+import kotlin.math.roundToInt
 
 
 /**
  * @author IzzelAliz
  */
-class ActionPass : QuestAction<String>() {
+class ActionScale(val number: ParsedAction<*>) : QuestAction<Double>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
-        return CompletableFuture.completedFuture("")
+    override fun process(frame: QuestContext.Frame): CompletableFuture<Double> {
+        return frame.newFrame(number).run<Any>().thenApply {
+            Coerce.format(Coerce.toDouble(it))
+        }
     }
 
     override fun toString(): String {
-        return "ActionPass()"
+        return "ActionScale(number=$number)"
     }
 
     companion object {
 
-        @KetherParser(["pass"])
+        @KetherParser(["scale", "scaled"])
         fun parser() = ScriptParser.parser {
-            ActionPass()
+            ActionScale(it.next(ArgTypes.ACTION))
         }
     }
 }

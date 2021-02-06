@@ -2,6 +2,7 @@ package io.izzel.taboolib.kotlin.kether.action.bukkit
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
@@ -25,6 +26,7 @@ class ActionContinue : QuestAction<Void>() {
 
     companion object {
 
+        @KetherParser(["continue"])
         fun parser() = ScriptParser.parser {
             ActionContinue()
         }

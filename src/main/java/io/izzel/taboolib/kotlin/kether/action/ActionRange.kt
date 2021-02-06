@@ -3,6 +3,7 @@ package io.izzel.taboolib.kotlin.kether.action
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -36,6 +37,7 @@ class ActionRange(val from: Double, val to: Double, val step: Double = 0.0) : Qu
 
     companion object {
 
+        @KetherParser(["range"])
         fun parser() = ScriptParser.parser {
             val from = it.nextDouble()
             it.expect("to")

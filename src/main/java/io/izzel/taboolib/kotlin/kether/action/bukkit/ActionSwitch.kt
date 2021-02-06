@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import org.bukkit.Bukkit
@@ -30,7 +31,7 @@ class ActionSwitch(val sender: ParsedAction<*>) : QuestAction<Void>() {
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["switch"])
         fun parser() = ScriptParser.parser {
             ActionSwitch(it.next(ArgTypes.ACTION))
         }

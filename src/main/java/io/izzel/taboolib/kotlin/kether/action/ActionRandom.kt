@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.util.lite.Numbers
 import java.util.concurrent.CompletableFuture
@@ -55,6 +56,7 @@ class ActionRandom(val from: Double, val to: Double, val action: ParsedAction<*>
          * random players
          * random range 1 to 10
          */
+        @KetherParser(["random"])
         fun parser() = ScriptParser.parser {
             it.mark()
             try {

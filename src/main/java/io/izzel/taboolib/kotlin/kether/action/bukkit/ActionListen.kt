@@ -5,10 +5,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.kether.common.util.LocalizedException
-import io.izzel.taboolib.kotlin.kether.EventOperator
-import io.izzel.taboolib.kotlin.kether.Kether
-import io.izzel.taboolib.kotlin.kether.ScriptContext
-import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.*
 import io.izzel.taboolib.kotlin.kether.util.Closables
 import java.util.concurrent.CompletableFuture
 
@@ -36,7 +33,7 @@ class ActionListen(val operator: EventOperator<*>, val value: ParsedAction<*>) :
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["listen", "on"])
         fun parser() = ScriptParser.parser {
             val name = it.nextToken()
             val event = Kether.getEventOperator(name) ?: throw LocalizedException.of("unknown-event", name)

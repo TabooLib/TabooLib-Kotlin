@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -49,6 +50,7 @@ class ActionFor(val key: String, val values: ParsedAction<*>, val action: Parsed
          * for i in players then {  }
          * for i in range 1 to 10 then {  }
          */
+        @KetherParser(["for"])
         fun parser() = ScriptParser.parser {
             ActionFor(it.nextToken(), it.run {
                 expect("in")

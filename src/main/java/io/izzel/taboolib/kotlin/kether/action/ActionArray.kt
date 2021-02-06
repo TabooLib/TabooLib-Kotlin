@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -42,6 +43,7 @@ class ActionArray(val list: List<ParsedAction<*>>) : QuestAction<List<Any>>() {
         /**
          * set a to array [ *1 *2 *3 ]
          */
+        @KetherParser(["array"])
         fun parser() = ScriptParser.parser {
             ActionArray(it.next(ArgTypes.listOf(ArgTypes.ACTION)))
         }

@@ -5,6 +5,8 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.kether.common.util.LocalizedException
+import io.izzel.taboolib.kotlin.kether.Kether.expects
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.locale.TLocale
@@ -34,7 +36,7 @@ class ActionTitle(val title: ParsedAction<*>, val subTitle: ParsedAction<*>, val
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["title"])
         fun parser() = ScriptParser.parser {
             val title = it.next(ArgTypes.ACTION)
             it.expect("subtitle")
@@ -44,7 +46,7 @@ class ActionTitle(val title: ParsedAction<*>, val subTitle: ParsedAction<*>, val
             var fadeOut = 0
             it.mark()
             try {
-                it.expect("by")
+                it.expects("by", "with")
                 fadeIn = it.nextInt()
                 stay = it.nextInt()
                 fadeOut = it.nextInt()

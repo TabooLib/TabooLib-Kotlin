@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -43,9 +44,9 @@ class ActionMap(val key: String, val values: ParsedAction<*>, val action: Parsed
         }
     }
 
-
     companion object {
 
+        @KetherParser(["map"])
         fun parser() = ScriptParser.parser {
             ActionMap(it.nextToken(), it.run {
                 expect("in")

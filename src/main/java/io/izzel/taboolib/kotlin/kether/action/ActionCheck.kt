@@ -5,6 +5,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.kether.common.util.LocalizedException
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.action.ActionCheck.Symbol.*
 import io.izzel.taboolib.util.Coerce
@@ -49,7 +50,7 @@ class ActionCheck(val left: ParsedAction<*>, val right: ParsedAction<*>, val sym
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["check"])
         fun parser() = ScriptParser.parser {
             val left = it.next(ArgTypes.ACTION)
             val symbol = when (val type = it.nextToken()) {

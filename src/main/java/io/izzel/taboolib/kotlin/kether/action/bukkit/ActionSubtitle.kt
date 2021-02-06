@@ -4,6 +4,8 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.kotlin.kether.Kether.expects
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.locale.TLocale
@@ -29,7 +31,7 @@ class ActionSubtitle(val subTitle: ParsedAction<*>, val fadeIn: Int, val stay: I
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["subtitle"])
         fun parser() = ScriptParser.parser {
             val subTitle = it.next(ArgTypes.ACTION)
             var fadeIn = 0
@@ -37,7 +39,7 @@ class ActionSubtitle(val subTitle: ParsedAction<*>, val fadeIn: Int, val stay: I
             var fadeOut = 0
             it.mark()
             try {
-                it.expect("by")
+                it.expects("by", "with")
                 fadeIn = it.nextInt()
                 stay = it.nextInt()
                 fadeOut = it.nextInt()

@@ -5,6 +5,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.kether.common.util.LocalizedException
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.util.Features
@@ -28,7 +29,7 @@ class ActionTell(val message: ParsedAction<*>) : QuestAction<Void>() {
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["tell", "send", "message"])
         fun parser() = ScriptParser.parser {
             ActionTell(it.next(ArgTypes.ACTION))
         }

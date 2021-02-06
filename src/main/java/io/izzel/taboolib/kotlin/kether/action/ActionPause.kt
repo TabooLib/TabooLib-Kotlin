@@ -2,6 +2,7 @@ package io.izzel.taboolib.kotlin.kether.action
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
 
@@ -21,6 +22,7 @@ class ActionPause : QuestAction<Void>() {
 
     companion object {
 
+        @KetherParser(["pause"])
         fun parser() = ScriptParser.parser {
             ActionPause()
         }

@@ -5,6 +5,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherFunction
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
@@ -32,7 +33,7 @@ class ActionFunction(val source: ParsedAction<*>) : QuestAction<String>() {
 
     companion object {
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["inline", "function"])
         fun parser() = ScriptParser.parser {
             ActionFunction(it.next(ArgTypes.ACTION))
         }

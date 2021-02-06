@@ -6,6 +6,7 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.kether.Kether
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.module.dependency.TDependency
@@ -41,7 +42,7 @@ class ActionPlayer(val operator: PlayerOperator, val symbol: Symbol, val value: 
             }
         }
 
-        @Suppress("UnstableApiUsage")
+        @KetherParser(["player"])
         fun parser() = ScriptParser.parser {
             it.mark()
             val tokens = arrayListOf(it.nextToken())
