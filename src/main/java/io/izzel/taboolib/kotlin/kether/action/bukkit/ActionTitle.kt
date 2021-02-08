@@ -1,5 +1,6 @@
 package io.izzel.taboolib.kotlin.kether.action.bukkit
 
+import io.izzel.kether.common.actions.LiteralAction
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
@@ -9,6 +10,7 @@ import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.action.ActionPass
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.util.Features
 import org.bukkit.entity.Player
@@ -39,8 +41,14 @@ class ActionTitle(val title: ParsedAction<*>, val subTitle: ParsedAction<*>, val
         @KetherParser(["title"])
         fun parser() = ScriptParser.parser {
             val title = it.next(ArgTypes.ACTION)
-            it.expect("subtitle")
-            val subTitle = it.next(ArgTypes.ACTION)
+            it.mark()
+            val subTitle = try {
+                it.expect("subtitle")
+                it.next(ArgTypes.ACTION)
+            } catch (ignored: Exception) {
+                it.reset()
+                ParsedAction(ActionPass())
+            }
             var fadeIn = 0
             var stay = 20
             var fadeOut = 0

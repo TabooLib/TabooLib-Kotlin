@@ -4,13 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.kether.common.util.LocalizedException
-import io.izzel.taboolib.kotlin.kether.Kether
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptContext
-import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.module.dependency.TDependency
-import io.izzel.taboolib.module.event.EventNormal
+import io.izzel.taboolib.kotlin.kether.*
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture
 
@@ -55,7 +49,7 @@ class ActionPlayer(val operator: PlayerOperator, val symbol: Symbol, val value: 
                     }
                     tokens[i - 1] == a
                 }
-            } ?: throw LocalizedException.of("load-error.custom", "Unknown Operator: ${tokens.joinToString(" ")}")
+            } ?: throw KetherError.NOT_PLAYER_OPERATOR.create(tokens.joinToString(" "))
             it.reset()
             structure.key.split("_").forEach { _ ->
                 it.nextToken()

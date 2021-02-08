@@ -4,8 +4,8 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.kether.KetherParser
+import io.izzel.taboolib.kotlin.kether.KetherError
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture
@@ -48,7 +48,7 @@ class ActionEvent(val key: String, val symbol: Symbol, val value: ParsedAction<*
             val symbol = when (val type = it.nextToken()) {
                 "set" -> Symbol.SET
                 "get" -> Symbol.GET
-                else -> throw LocalizedException.of("not-event-method", type)
+                else -> throw KetherError.NOT_EVENT_OPERATOR.create(type)
             }
             val key = it.nextToken()
             val value = it.next(ArgTypes.ACTION)

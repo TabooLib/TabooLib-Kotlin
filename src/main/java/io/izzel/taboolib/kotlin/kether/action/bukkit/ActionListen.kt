@@ -4,7 +4,6 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.kether.*
 import io.izzel.taboolib.kotlin.kether.util.Closables
 import java.util.concurrent.CompletableFuture
@@ -36,7 +35,7 @@ class ActionListen(val operator: EventOperator<*>, val value: ParsedAction<*>) :
         @KetherParser(["listen", "on"])
         fun parser() = ScriptParser.parser {
             val name = it.nextToken()
-            val event = Kether.getEventOperator(name) ?: throw LocalizedException.of("unknown-event", name)
+            val event = Kether.getEventOperator(name) ?: throw KetherError.NOT_EVENT.create(name)
             it.expect("then")
             ActionListen(event, it.next(ArgTypes.ACTION))
         }

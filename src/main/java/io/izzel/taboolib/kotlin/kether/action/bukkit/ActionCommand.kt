@@ -4,8 +4,8 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.kether.KetherParser
+import io.izzel.taboolib.kotlin.kether.KetherError
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.util.Features
@@ -55,11 +55,11 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
             it.mark()
             val by = try {
                 it.expect("by")
-                when (it.nextToken()) {
+                when (val type = it.nextToken()) {
                     "player" -> Type.PLAYER
                     "player_op", "op" -> Type.PLAYER_OP
                     "console", "server" -> Type.CONSOLE
-                    else -> throw LocalizedException.of("load-error.not-command-type", it)
+                    else -> throw KetherError.NOT_COMMAND_SENDER.create(type)
                 }
             } catch (ignored: Exception) {
                 it.reset()
