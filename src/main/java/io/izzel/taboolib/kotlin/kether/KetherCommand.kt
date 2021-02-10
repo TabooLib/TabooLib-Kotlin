@@ -27,10 +27,10 @@ class KetherCommand : BaseMainCommand() {
             args.isNotEmpty() -> {
                 val time = System.currentTimeMillis()
                 try {
-                    ScriptContext.create(ScriptLoader.load("def main = { ${Indexed.join(args, 0, " ")} }")) {
+                    KetherShell.eval(Indexed.join(args, 0, " "), false) {
                         this.sender = sender
-                    }.runActions().thenAccept {
-                        sender.sendMessage("§8[§fTabooLib§8] §7Result: §f${it} §8(${System.currentTimeMillis() - time}ms)")
+                    }.thenApply {
+                        sender.sendMessage("§8[§fTabooLib§8] §7Result: §f$it §8(${System.currentTimeMillis() - time}ms)")
                     }
                 } catch (e: NullPointerException) {
                     e.printStackTrace()

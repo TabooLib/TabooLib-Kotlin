@@ -83,6 +83,10 @@ object Kether {
         registry.registerAction(namespace ?: "kether", name, parser)
     }
 
+    fun removeAction(name: String, namespace: String? = null) {
+        registry.unregisterAction(namespace ?: "kether", name)
+    }
+
     fun addPlayerOperator(name: String, operator: PlayerOperator) {
         operatorsPlayer[name] = operator
     }
