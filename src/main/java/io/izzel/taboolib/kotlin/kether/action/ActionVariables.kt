@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.deepVars
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -12,7 +13,7 @@ import java.util.concurrent.CompletableFuture
 class ActionVariables() : QuestAction<List<String>>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<List<String>> {
-        return CompletableFuture.completedFuture(context.variables().keys().toList())
+        return CompletableFuture.completedFuture(context.deepVars().keys.toList())
     }
 
     override fun toString(): String {

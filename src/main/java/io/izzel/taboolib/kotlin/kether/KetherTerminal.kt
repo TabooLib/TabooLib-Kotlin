@@ -1,5 +1,6 @@
 package io.izzel.taboolib.kotlin.kether
 
+import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.TabooLib
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.PlayerContainer
@@ -92,21 +93,24 @@ object KetherTerminal : Listener {
                         }
                         player.sendMessage("§c[Terminal] §7(${shell.size}) $ $message")
                         try {
-                            val eval = KetherShell.eval(shell, cacheScript = false, namespace = namespace[player.name] ?: emptyList()) {
+                            KetherShell.eval(shell, cacheScript = false, namespace = namespace[player.name] ?: emptyList()) {
                                 sender = player
+                            }.thenApply {
+                                if (it != null) {
+                                    player.sendMessage("§c[Terminal] §7(${shell.size}) > §f$it")
+                                }
                             }
-                            if (eval != null) {
-                                player.sendMessage("§c[Terminal] §7(${shell.size}) > §f$eval")
-                            }
-                        } catch (e: NullPointerException) {
-                            e.printStackTrace()
-                            shell.removeLastOrNull()
-                        } catch (e: Exception) {
+                        } catch (e: LocalizedException) {
                             player.sendMessage("§c[Terminal] §7Use \"clear\" to reset the terminal.")
                             player.sendMessage("§c[Terminal] §7Unexpected exception while parsing kether shell:")
                             e.localizedMessage?.split("\n")?.forEach {
                                 player.sendMessage("§c[Terminal] §8${it}")
                             }
+                            shell.removeLastOrNull()
+                        } catch (e: Throwable) {
+                            player.sendMessage("§c[Terminal] §7Use \"clear\" to reset the terminal.")
+                            player.sendMessage("§c[Terminal] §7Unexpected exception while parsing kether shell.")
+                            e.printStackTrace()
                             shell.removeLastOrNull()
                         }
                     }

@@ -4,10 +4,7 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.kotlin.kether.KetherFunction
-import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptContext
-import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -17,12 +14,10 @@ import java.util.concurrent.CompletableFuture
 class ActionFunction(val source: ParsedAction<*>) : QuestAction<String>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<String> {
-        val s = context.context() as ScriptContext
+        val vars = context.deepVars()
         return context.newFrame(source).run<Any>().thenApply {
             KetherFunction.parse(it.toString().trimIndent()) {
-                s.rootFrame().variables().values().forEach { v ->
-                    rootFrame().variables().set(v.key, v.value)
-                }
+                vars.forEach { (k, v) -> rootFrame().variables().set(k, v) }
             }
         }
     }

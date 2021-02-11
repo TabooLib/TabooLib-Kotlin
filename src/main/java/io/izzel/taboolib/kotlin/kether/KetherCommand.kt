@@ -2,6 +2,7 @@ package io.izzel.taboolib.kotlin.kether
 
 import io.izzel.kether.common.api.DefaultRegistry
 import io.izzel.kether.common.api.QuestActionParser
+import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.Indexed
 import io.izzel.taboolib.kotlin.Reflex
 import io.izzel.taboolib.module.command.base.BaseCommand
@@ -32,13 +33,14 @@ class KetherCommand : BaseMainCommand() {
                     }.thenApply {
                         sender.sendMessage("§8[§fTabooLib§8] §7Result: §f$it §8(${System.currentTimeMillis() - time}ms)")
                     }
-                } catch (e: NullPointerException) {
-                    e.printStackTrace()
-                } catch (e: Exception) {
+                } catch (e: LocalizedException) {
                     sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing kether shell:")
                     e.localizedMessage?.split("\n")?.forEach {
                         sender.sendMessage("§8[§fTabooLib§8] §8${it}")
                     }
+                } catch (e: Throwable) {
+                    sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing kether shell.")
+                    e.printStackTrace()
                 }
             }
             sender is Player -> {
@@ -58,13 +60,14 @@ class KetherCommand : BaseMainCommand() {
                 this.sender = sender
             }
             sender.sendMessage("§8[§fTabooLib§8] §7Result: §f\"${r}\" §8(${System.currentTimeMillis() - time}ms)")
-        } catch (e: NullPointerException) {
-            e.printStackTrace()
         } catch (e: Exception) {
             sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing inline script:")
             e.localizedMessage?.split("\n")?.forEach {
                 sender.sendMessage("§8[§fTabooLib§8] §8${it}")
             }
+        } catch (e: Throwable) {
+            sender.sendMessage("§8[§fTabooLib§8] §7Unexpected exception while parsing inline script.")
+            e.printStackTrace()
         }
     }
 
@@ -83,7 +86,7 @@ class KetherCommand : BaseMainCommand() {
         sender.sendMessage("§8[§fTabooLib§8] §8  ${parsers["kether"]?.size} public")
         sender.sendMessage("§8[§fTabooLib§8] §8  ${parsers.filter { it.key != "kether" }.values.sumBy { it.size }} private")
         sender.sendMessage("§8[§fTabooLib§8] §7Details:")
-        parsers.forEach { (k ,v) ->
+        parsers.forEach { (k, v) ->
             sender.sendMessage("§8[§fTabooLib§8] §7  ${k}: §f${v.keys}")
         }
     }

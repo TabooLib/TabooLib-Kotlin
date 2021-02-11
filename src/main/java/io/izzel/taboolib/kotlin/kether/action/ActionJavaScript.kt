@@ -5,6 +5,7 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.deepVars
 import io.izzel.taboolib.module.event.EventNormal
 import io.izzel.taboolib.util.Features
 import org.bukkit.Bukkit
@@ -28,19 +29,13 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
                             "sender" to s.sender,
                             "server" to Bukkit.getServer(),
                         ).also {
-                            val vars = ArrayList<String>()
-                            var p = context.parent()
-                            while (p.isPresent) {
-                                vars.addAll(p.get().variables().keys())
-                                p = p.get().parent()
-                            }
-                            it.putAll(vars.map { i -> i to context.variables().get<Any>(i).orElse(null) })
+                            it.putAll(context.deepVars())
                         }, s
                     ).bindings
                 )
             )
         } catch (e: Exception) {
-            println(e.localizedMessage)
+            e.printStackTrace()
         }
         return CompletableFuture.completedFuture(r)
     }
