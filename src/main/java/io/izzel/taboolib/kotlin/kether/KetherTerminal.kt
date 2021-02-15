@@ -2,6 +2,7 @@ package io.izzel.taboolib.kotlin.kether
 
 import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.TabooLib
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Tasks
 import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
@@ -56,7 +57,8 @@ object KetherTerminal : Listener {
     @TPacket(type = TPacket.Type.SEND)
     fun send(player: Player, packet: Packet): Boolean {
         if (packet.equals("PacketPlayOutChat") && player.hasMetadata("kether:terminal")) {
-            val message = packet.reflex("a").read<String>("e")!!
+            val key = if (Version.isAfter(Version.v1_16)) "e" else "b"
+            val message = packet.reflex("a").read<String>(key)!!
             if (message.startsWith("[Terminal]") || message.isEmpty()) {
                 return true
             }
