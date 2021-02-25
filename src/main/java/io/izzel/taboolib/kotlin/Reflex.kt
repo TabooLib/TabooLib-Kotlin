@@ -127,5 +127,9 @@ class Reflex(val from: Class<*>) {
         fun from(clazz: Class<*>) = Reflex(clazz)
 
         fun from(clazz: Class<*>, instance: Any?) = Reflex(clazz).instance(instance)
+
+        fun Any.toReflex(clazz: Class<*>? = null) = Reflex(clazz ?: javaClass).instance(this)
+
+        fun Class<*>.asReflex(instance: Any? = null) = Reflex(this).instance(instance)
     }
 }
