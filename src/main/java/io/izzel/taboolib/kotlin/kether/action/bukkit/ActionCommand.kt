@@ -22,7 +22,7 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
     }
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
-        return context.newFrame(command).run<Any>().thenAccept {
+        return context.newFrame(command).run<Any>().thenAcceptAsync( {
             val command = it.toString().trimIndent()
             when (type) {
                 Type.PLAYER -> {
@@ -38,7 +38,7 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
                     Features.dispatchCommand(command.replace("@sender", viewer))
                 }
             }
-        }
+        }, context.context().executor)
     }
 
     override fun toString(): String {
