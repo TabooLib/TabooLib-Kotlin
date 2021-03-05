@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 /**
  * @Author 坏黑
@@ -15,18 +16,12 @@ class Mirror {
 
     val dataMap = Maps.newConcurrentMap<String, MirrorData>()!!
 
-    fun define(id: String) {
-        dataMap.computeIfAbsent(id) { MirrorData() }.define()
-    }
-
-    fun finish(id: String) {
-        dataMap[id]?.finish()
-    }
-
-    inline fun check(id: String, func: () -> Unit) {
-        define(id)
-        func()
-        finish(id)
+    fun mirrorFuture(id: String, func: MirrorFuture.() -> Unit) {
+        func(MirrorFuture().also { mf ->
+            mf.future.thenApply {
+                dataMap[id]?.finish(mf.startTime)
+            }
+        })
     }
 
     fun collect(opt: Options.() -> Unit = {}): MirrorCollect {
@@ -41,10 +36,37 @@ class Mirror {
         return collect
     }
 
+    @Deprecated("unsafe", ReplaceWith("mirrorFuture()"))
+    fun define(id: String) {
+        dataMap.computeIfAbsent(id) { MirrorData() }.define()
+    }
+
+    @Deprecated("unsafe", ReplaceWith("mirrorFuture()"))
+    fun finish(id: String) {
+        dataMap[id]?.finish()
+    }
+
+    @Deprecated("unsafe", ReplaceWith("mirrorFuture()"))
+    inline fun check(id: String, func: () -> Unit) {
+        define(id)
+        func()
+        finish(id)
+    }
+
     class Options {
 
         var childFormat = "§c[TabooLib] §8{0}§f{1} §8[{2} ms] §c[{3} ms] §7{4}%"
         var parentFormat = "§c[TabooLib] §8{0}§7{1} §8[{2} ms] §c[{3} ms] §7{4}%"
+    }
+
+    class MirrorFuture {
+
+        val startTime = System.nanoTime()
+        val future = CompletableFuture<Void>()
+
+        fun finish() {
+            future.complete(null)
+        }
     }
 
     class MirrorCollect(

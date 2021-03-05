@@ -6,7 +6,6 @@ import java.math.RoundingMode
 class MirrorData {
 
     private var startTime = 0L
-    private var stopTime = 0L
 
     lateinit var timeTotal: BigDecimal
         private set
@@ -30,7 +29,11 @@ class MirrorData {
     }
 
     fun finish(): MirrorData {
-        stopTime = System.nanoTime()
+        return finish(startTime)
+    }
+
+    fun finish(startTime: Long): MirrorData {
+        val stopTime = System.nanoTime()
         timeLatest = BigDecimal((stopTime - startTime) / 1000000.0).setScale(2, RoundingMode.HALF_UP)
         timeTotal = timeTotal.add(timeLatest)
         if (timeLatest.compareTo(timeHighest) == 1) {
@@ -75,7 +78,6 @@ class MirrorData {
     override fun toString(): String {
         return "MirrorData(" +
                 "startTime=$startTime, " +
-                "stopTime=$stopTime, " +
                 "timeTotal=$timeTotal, " +
                 "timeLatest=$timeLatest, " +
                 "timeLowest=$timeLowest, " +
