@@ -44,9 +44,9 @@ class ActionJoin(val source: List<ParsedAction<*>>, val separator: String) : Que
         @KetherParser(["join"])
         fun parser() = ScriptParser.parser {
             val source = it.next(ArgTypes.listOf(ArgTypes.ACTION))
-            it.mark()
             ActionJoin(
                 source, try {
+                    it.mark()
                     it.expects("by", "with")
                     it.nextToken()
                 } catch (ignored: Exception) {

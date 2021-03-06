@@ -9,8 +9,8 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 /**
- * @Author 坏黑
- * @Since 2018-12-24 16:32
+ * @author 坏黑
+ * @since 2018-12-24 16:32
  */
 class Mirror {
 

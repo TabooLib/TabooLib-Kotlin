@@ -94,4 +94,10 @@ class Demand(val source: String) {
         result = 31 * result + tags.hashCode()
         return result
     }
+
+    companion object {
+
+        fun String.toDemand() = Demand(this)
+
+    }
 }

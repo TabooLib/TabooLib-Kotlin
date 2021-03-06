@@ -4,7 +4,6 @@ import io.izzel.kether.common.api.Quest
 import io.izzel.kether.common.util.LocalizedException
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.jvm.Throws
 
 /**
  * your health {{player health}}, your name {{player name}}

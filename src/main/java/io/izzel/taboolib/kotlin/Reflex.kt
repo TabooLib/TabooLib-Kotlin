@@ -19,14 +19,14 @@ class Reflex(val from: Class<*>) {
         return this
     }
 
-    fun <T> read(name: String): T? {
-        val deep = name.indexOf("/")
+    fun <T> read(path: String): T? {
+        val deep = path.indexOf("/")
         if (deep == -1) {
-            return get(name)
+            return get(path)
         }
         var find: T? = null
-        var ref = of(get(name.substring(0, deep))!!)
-        name.substring(deep).split("/").filter { it.isNotEmpty() }.forEach { point ->
+        var ref = of(get(path.substring(0, deep))!!)
+        path.substring(deep).split("/").filter { it.isNotEmpty() }.forEach { point ->
             find = ref.get(point)
             if (find != null) {
                 ref = of(find!!)
@@ -35,14 +35,14 @@ class Reflex(val from: Class<*>) {
         return find
     }
 
-    fun write(name: String, value: Any?) {
-        val deep = name.indexOf("/")
+    fun write(path: String, value: Any?) {
+        val deep = path.indexOf("/")
         if (deep == -1) {
-            return set(name, value)
+            return set(path, value)
         }
-        val node0 = name.substring(0, deep)
-        val node1 = name.substring(name.lastIndexOf("/") + 1, name.length)
-        val space = name.substring(deep).split("/").filter { it.isNotEmpty() }
+        val node0 = path.substring(0, deep)
+        val node1 = path.substring(path.lastIndexOf("/") + 1, path.length)
+        val space = path.substring(deep).split("/").filter { it.isNotEmpty() }
         var ref = of(get(node0)!!)
         space.forEachIndexed { index, point ->
             if (index + 1 < space.size) {
@@ -53,66 +53,41 @@ class Reflex(val from: Class<*>) {
     }
 
     fun <T> get(type: Class<T>, index: Int = 0): T? {
-        val field = fieldMap.computeIfAbsent(from.name) {
-            Ref.getDeclaredFields(from).map {
-                it.isAccessible = true
-                it.name to it
-            }.toMap(ConcurrentHashMap())
-        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
+        val field = from.reflexFields().values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
         val obj = Ref.getField(instance, field)
         return if (obj != null) obj as T else null
     }
 
     fun <T> get(name: String): T? {
-        val map = fieldMap.computeIfAbsent(from.name) {
-            Ref.getDeclaredFields(from).map {
-                it.isAccessible = true
-                it.name to it
-            }.toMap(ConcurrentHashMap())
-        }
+        val map = from.reflexFields()
         val obj = Ref.getField(instance, map[name] ?: throw NoSuchFieldException("$name at $from"))
         return if (obj != null) obj as T else null
     }
 
     fun set(type: Class<*>, value: Any?, index: Int = 0) {
-        val field = fieldMap.computeIfAbsent(from.name) {
-            Ref.getDeclaredFields(from).map {
-                it.isAccessible = true
-                it.name to it
-            }.toMap(ConcurrentHashMap())
-        }.values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
+        val field = from.reflexFields().values.filter { it.type == type }.getOrNull(index - 1) ?: throw NoSuchFieldException("$type($index) at $from")
         Ref.putField(instance, field, value)
     }
 
     fun set(name: String, value: Any?) {
-        val map = fieldMap.computeIfAbsent(from.name) {
-            Ref.getDeclaredFields(from).map {
-                it.isAccessible = true
-                it.name to it
-            }.toMap(ConcurrentHashMap())
-        }
+        val map = from.reflexFields()
         Ref.putField(instance, map[name] ?: throw NoSuchFieldException("$name at $from"), value)
     }
 
     fun <T> invoke(name: String, vararg parameter: Any?): T? {
-        val map = methodMap.computeIfAbsent(from.name) {
-            from.declaredMethods.map {
-                it.isAccessible = true
-                it.name to it
-            }
-        }
+        val map = from.reflexMethods()
         val method = map.filter { it.first == name }.firstOrNull {
             if (it.second.parameterCount == parameter.size) {
                 var checked = true
                 it.second.parameterTypes.forEachIndexed { index, p ->
-                    if (parameter[index] != null && parameter[index]!!.javaClass != p) {
+                    if (parameter[index] != null && !p.isInstance(parameter[index])) {
                         checked = false
                     }
                 }
                 return@firstOrNull checked
             }
             return@firstOrNull false
-        } ?: throw NoSuchMethodException("$name(${parameter.joinToString(", ") { it?.javaClass?.simpleName ?: "null" }}) at $from")
+        } ?: throw NoSuchMethodException("$name(${parameter.joinToString(", ") { it?.javaClass?.name ?: "null" }}) at $from")
         val obj = method.second.invoke(instance, *parameter)
         return if (obj != null) obj as T else null
     }
@@ -122,14 +97,92 @@ class Reflex(val from: Class<*>) {
         private val fieldMap = ConcurrentHashMap<String, Map<String, Field>>()
         private val methodMap = ConcurrentHashMap<String, List<Pair<String, Method>>>()
 
-        fun of(instance: Any): Reflex = Reflex(instance.javaClass).instance(instance)
-
-        fun from(clazz: Class<*>) = Reflex(clazz)
-
-        fun from(clazz: Class<*>, instance: Any?) = Reflex(clazz).instance(instance)
-
+        /**
+         * 将对象转换为 Reflex 结构
+         */
         fun Any.toReflex(clazz: Class<*>? = null) = Reflex(clazz ?: javaClass).instance(this)
 
+        /**
+         * 通过 Reflex 执行对象中的方法
+         */
+        fun <T> Any.reflexInvoke(path: String, vararg parameter: Any?) = toReflex().invoke<T>(path, *parameter)
+
+        /**
+         * 通过 Reflex 获取对象中的属性
+         */
+        fun <T> Any.reflex(path: String) = toReflex().read<T>(path)
+
+        /**
+         * 通过 Reflex 获取对象中的属性
+         */
+        fun Any.reflex(path: String, value: Any?) = toReflex().write(path, value)
+
+        /**
+         * 将 Class 转换 Reflex 结构
+         */
         fun Class<*>.asReflex(instance: Any? = null) = Reflex(this).instance(instance)
+
+        /**
+         * 通过 Reflex 执行 Class 中的静态方法
+         */
+        fun <T> Class<*>.staticInvoke(path: String, vararg parameter: Any?) = asReflex().invoke<T>(path, *parameter)
+
+        /**
+         * 通过 Reflex 获取 Class 中的静态属性
+         */
+        fun <T> Class<*>.static(path: String) = asReflex().read<T>(path)
+
+        /**
+         * 通过 Reflex 设置 Class 中的静态属性
+         */
+        fun Class<*>.static(path: String, value: Any?) = asReflex().write(path, value)
+
+        /**
+         * 缓存并获取所有属性（包含父类）
+         */
+        fun Class<*>.reflexFields() = fieldMap.computeIfAbsent(name) {
+            HashMap<String, Field>().also { map ->
+                fun cache(clazz: Class<*>) {
+                    map.putAll(clazz.declaredFields.map {
+                        it.isAccessible = true
+                        it.name to it
+                    })
+                    if (clazz.superclass != null && clazz.superclass != Object::class.java) {
+                        cache(clazz.superclass)
+                    }
+                }
+                cache(this)
+            }
+        }
+
+        /**
+         * 缓存并获取所有方法（包含父类及接口）
+         */
+        fun Class<*>.reflexMethods() = methodMap.computeIfAbsent(name) {
+            ArrayList<Pair<String, Method>>().also { map ->
+                fun cache(clazz: Class<*>) {
+                    map.addAll(clazz.declaredMethods.map {
+                        it.isAccessible = true
+                        it.name to it
+                    })
+                    if (clazz.superclass != null && clazz.superclass != Object::class.java) {
+                        cache(clazz.superclass)
+                    }
+                    clazz.interfaces.forEach {
+                        cache(it)
+                    }
+                }
+                cache(this)
+            }
+        }
+
+        @Deprecated("", ReplaceWith("instance.toReflex()", "io.izzel.taboolib.kotlin.Reflex.Companion.toReflex"))
+        fun of(instance: Any): Reflex = instance.toReflex()
+
+        @Deprecated("", ReplaceWith("clazz.asReflex()", "io.izzel.taboolib.kotlin.Reflex.Companion.asReflex"))
+        fun from(clazz: Class<*>) = clazz.asReflex()
+
+        @Deprecated("", ReplaceWith("clazz.asReflex(instance)", "io.izzel.taboolib.kotlin.Reflex.Companion.asReflex"))
+        fun from(clazz: Class<*>, instance: Any?) = clazz.asReflex(instance)
     }
 }

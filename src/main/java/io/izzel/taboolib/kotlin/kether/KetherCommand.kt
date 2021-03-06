@@ -10,7 +10,6 @@ import io.izzel.taboolib.module.command.base.BaseMainCommand
 import io.izzel.taboolib.module.command.base.SubCommand
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import java.lang.NullPointerException
 
 /**
  * TabooLibKotlin

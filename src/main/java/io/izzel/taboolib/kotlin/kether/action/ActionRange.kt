@@ -2,7 +2,6 @@ package io.izzel.taboolib.kotlin.kether.action
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
-import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import java.util.concurrent.CompletableFuture

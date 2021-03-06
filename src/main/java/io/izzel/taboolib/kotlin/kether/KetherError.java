@@ -9,6 +9,7 @@ public enum KetherError {
     NOT_EVENT_OPERATOR,
     NOT_EVENT,
     NOT_PLAYER_OPERATOR,
+    NOT_MATERIAL,
     CUSTOM;
 
     public LocalizedException create(Object... args) {

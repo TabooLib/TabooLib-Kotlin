@@ -4,8 +4,9 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.kotlin.kether.KetherParser
+import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherError
+import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.util.Features
@@ -18,7 +19,7 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
 
     enum class Type {
 
-        PLAYER, PLAYER_OP, CONSOLE
+        PLAYER, OPERATOR, CONSOLE
     }
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
@@ -29,7 +30,7 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
                     val viewer = (context.context() as ScriptContext).sender ?: throw RuntimeException("No sender selected.")
                     Features.dispatchCommand(viewer, command.replace("@sender", viewer.name))
                 }
-                Type.PLAYER_OP -> {
+                Type.OPERATOR -> {
                     val viewer = (context.context() as ScriptContext).sender ?: throw RuntimeException("No sender selected.")
                     Features.dispatchCommand(viewer, command.replace("@sender", viewer.name), true)
                 }
@@ -54,10 +55,10 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
             val command = it.next(ArgTypes.ACTION)
             it.mark()
             val by = try {
-                it.expect("by")
+                it.expects("by", "with", "as")
                 when (val type = it.nextToken()) {
                     "player" -> Type.PLAYER
-                    "player_op", "op" -> Type.PLAYER_OP
+                    "op", "operator" -> Type.OPERATOR
                     "console", "server" -> Type.CONSOLE
                     else -> throw KetherError.NOT_COMMAND_SENDER.create(type)
                 }

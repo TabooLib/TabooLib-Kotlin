@@ -12,4 +12,5 @@ load-error:
   not-event-operator: 'Unknown event operator {0}'
   not-event: 'Unknown event {0}'
   not-player-data: 'Unknown player operator {0}'
+  not-mateiral: 'Unknown material {0}'
   custom: '{0}'

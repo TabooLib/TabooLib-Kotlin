@@ -7,16 +7,12 @@ import io.izzel.taboolib.module.inject.PlayerContainer
 import io.izzel.taboolib.module.inject.TListener
 import io.izzel.taboolib.module.packet.Packet
 import io.izzel.taboolib.module.packet.TPacket
-import net.md_5.bungee.api.chat.BaseComponent
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.metadata.FixedMetadataValue
-import java.lang.Exception
-import java.lang.NullPointerException
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList

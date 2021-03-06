@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.izzel.taboolib.kotlin'
-version = '1.0.37'
+version = '1.0.38'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'ink.ptms.core:v11600:11600:all'
+    implementation 'ink.ptms.core:v11604:11604:all'
     implementation 'io.izzel.taboolib:TabooLib:5.44:all'
     implementation 'io.izzel.kether:common:1.0.10'
     implementation 'ink.ptms:navigation:1.0.1'

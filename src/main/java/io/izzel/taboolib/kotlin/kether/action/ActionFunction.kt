@@ -4,7 +4,10 @@ import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
-import io.izzel.taboolib.kotlin.kether.*
+import io.izzel.taboolib.kotlin.kether.KetherFunction
+import io.izzel.taboolib.kotlin.kether.KetherParser
+import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.deepVars
 import java.util.concurrent.CompletableFuture
 
 /**

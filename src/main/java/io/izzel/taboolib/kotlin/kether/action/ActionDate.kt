@@ -8,7 +8,6 @@ import io.izzel.taboolib.kotlin.kether.Kether
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 

@@ -7,11 +7,9 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.util.Coerce
 import org.bukkit.Bukkit
 import org.bukkit.Location
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 
 /**
