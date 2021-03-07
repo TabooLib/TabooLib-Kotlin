@@ -3,6 +3,7 @@ package io.izzel.taboolib.kotlin.kether
 import io.izzel.kether.common.api.DefaultRegistry
 import io.izzel.kether.common.api.QuestActionParser
 import io.izzel.kether.common.util.LocalizedException
+import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Indexed
 import io.izzel.taboolib.kotlin.Reflex
 import io.izzel.taboolib.module.command.base.BaseCommand
@@ -42,7 +43,7 @@ class KetherCommand : BaseMainCommand() {
                     e.printStackTrace()
                 }
             }
-            sender is Player -> {
+            sender is Player && Version.isAfter(Version.v1_13) -> {
                 KetherTerminal.open(sender)
             }
             else -> {
