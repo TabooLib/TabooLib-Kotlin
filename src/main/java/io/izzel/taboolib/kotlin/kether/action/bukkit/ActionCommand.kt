@@ -23,7 +23,7 @@ class ActionCommand(val command: ParsedAction<*>, val type: Type) : QuestAction<
     }
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
-        return context.newFrame(command).run<Any>().thenAcceptAsync( {
+        return context.newFrame(command).run<Any>().thenAcceptAsync({
             val command = it.toString().trimIndent()
             when (type) {
                 Type.PLAYER -> {

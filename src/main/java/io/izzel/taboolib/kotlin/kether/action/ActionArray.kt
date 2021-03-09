@@ -25,10 +25,10 @@ class ActionArray(val list: List<ParsedAction<*>>) : QuestAction<List<Any>>() {
 
     fun process(frame: QuestContext.Frame, future: CompletableFuture<List<Any>>, cur: Int, i: List<ParsedAction<*>>, array: ArrayList<Any>) {
         if (cur < i.size) {
-            frame.newFrame(i[cur]).run<Any>().thenAcceptAsync({
+            frame.newFrame(i[cur]).run<Any>().thenApply {
                 array.add(it)
                 process(frame, future, cur + 1, i, array)
-            }, frame.context().executor)
+            }
         } else {
             future.complete(array)
         }

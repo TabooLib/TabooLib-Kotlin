@@ -7,60 +7,39 @@ import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.kotlin.kether.script
+import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
 
-/**
- * @author IzzelAliz
- */
-class ActionFor(val key: String, val values: ParsedAction<*>, val action: ParsedAction<*>) : QuestAction<Void>() {
+class ActionWhile(val condition: ParsedAction<*>, val action: ParsedAction<*>) : QuestAction<Void>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
         val future = CompletableFuture<Void>()
-        context.newFrame(values).run<Any>().thenApply {
-            fun process(cur: Int, i: List<Any>) {
-                if (cur < i.size) {
-                    context.variables()[key] = i[cur]
+        fun process() {
+            context.newFrame(condition).run<Any>().thenApply {
+                if (Coerce.toBoolean(it)) {
                     context.newFrame(action).run<Any>().thenApply {
                         if (context.script().breakLoop) {
                             context.script().breakLoop = false
                             future.complete(null)
                         } else {
-                            process(cur + 1, i)
+                            process()
                         }
                     }
                 } else {
-                    context.variables().remove(key)
                     future.complete(null)
                 }
             }
-            when (it) {
-                is Collection<*> -> {
-                    process(0, it.map { i -> i as Any }.toList())
-                }
-                is Array<*> -> {
-                    process(0, it.map { i -> i as Any }.toList())
-                }
-                else -> {
-                    process(0, listOf(it))
-                }
-            }
         }
+        process()
         return future
     }
 
     companion object {
 
-        /**
-         * for i in players then {  }
-         * for i in range 1 to 10 then {  }
-         */
-        @KetherParser(["for"])
+        @KetherParser(["while"])
         fun parser() = ScriptParser.parser {
-            ActionFor(it.nextToken(), it.run {
-                expect("in")
-                next(ArgTypes.ACTION)
-            }, it.run {
+            ActionWhile(it.next(ArgTypes.ACTION), it.run {
                 expect("then")
                 next(ArgTypes.ACTION)
             })

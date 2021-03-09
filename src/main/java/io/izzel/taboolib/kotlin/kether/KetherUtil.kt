@@ -4,6 +4,8 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.util.LocalizedException
 import io.izzel.taboolib.kotlin.warning
 
+fun QuestContext.Frame.script() = context() as ScriptContext
+
 fun QuestContext.Frame.deepVars() = HashMap<String, Any?>().also { map ->
     var parent = parent()
     while (parent.isPresent) {

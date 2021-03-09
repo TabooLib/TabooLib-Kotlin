@@ -21,10 +21,10 @@ import java.util.concurrent.CompletableFuture
 class ActionToast(val material: Material, val message: ParsedAction<*>, val frame: ToastFrame) : QuestAction<Void>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
-        return context.newFrame(message).run<Any>().thenAccept {
+        return context.newFrame(message).run<Any>().thenAcceptAsync({
             val viewer = ((context.context() as ScriptContext).sender as? Player) ?: throw RuntimeException("No player selected.")
             viewer.sendToast(material, it.toString(), frame)
-        }
+        }, context.context().executor)
     }
 
     override fun toString(): String {

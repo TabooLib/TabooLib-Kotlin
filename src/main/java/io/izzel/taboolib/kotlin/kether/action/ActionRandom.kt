@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 /**
  * TabooLibKotlin
- * io.izzel.taboolib.kotlin.kether.action.ActionRange
+ * io.izzel.taboolib.kotlin.kether.action.ActionRandom
  *
  * @author sky
  * @since 2021/1/30 9:26 下午

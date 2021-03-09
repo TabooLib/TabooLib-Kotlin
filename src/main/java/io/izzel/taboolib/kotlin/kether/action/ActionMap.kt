@@ -15,33 +15,35 @@ class ActionMap(val key: String, val values: ParsedAction<*>, val action: Parsed
 
     override fun process(context: QuestContext.Frame): CompletableFuture<List<Any>> {
         val future = CompletableFuture<List<Any>>()
-        context.newFrame(values).run<Any>().thenAcceptAsync({
-            when (it) {
-                is Collection<*> -> {
-                    process(context, future, 0, it.map { i -> i as Any }.toList())
-                }
-                is Array<*> -> {
-                    process(context, future, 0, it.map { i -> i as Any }.toList())
-                }
-                else -> {
-                    process(context, future, 0, listOf(it))
+        val result = ArrayList<Any>()
+        context.newFrame(values).run<Any>().thenApply {
+            fun process(cur: Int, i: List<Any>) {
+                if (cur < i.size) {
+                    context.variables()[key] = i[cur]
+                    context.newFrame(action).run<Any>().thenApply { map ->
+                        if (map != null) {
+                            result += map
+                        }
+                        process(cur + 1, i)
+                    }
+                } else {
+                    context.variables().remove(key)
+                    future.complete(result)
                 }
             }
-        }, context.context().executor)
-        return future;
-    }
-
-    fun process(frame: QuestContext.Frame, future: CompletableFuture<List<Any>>, cur: Int, i: List<Any>, result: MutableList<Any> = ArrayList()) {
-        if (cur < i.size) {
-            frame.variables()[key] = i[cur]
-            frame.newFrame(action).run<Any>().thenAcceptAsync({
-                it?.let { result.add(it) }
-                process(frame, future, cur + 1, i, result)
-            }, frame.context().executor)
-        } else {
-            frame.variables().remove(key)
-            future.complete(result)
+            when (it) {
+                is Collection<*> -> {
+                    process(0, it.map { i -> i as Any }.toList())
+                }
+                is Array<*> -> {
+                    process(0, it.map { i -> i as Any }.toList())
+                }
+                else -> {
+                    process(0, listOf(it))
+                }
+            }
         }
+        return future;
     }
 
     companion object {

@@ -19,36 +19,42 @@ open class ScriptContext(service: ScriptService, script: Quest) :
     lateinit var id: String
 
     var event: Event?
+        get() = this["@Event"]
         set(value) {
-            rootFrame.variables().set("@Event", value)
-        }
-        get() {
-            return rootFrame.variables().get<Event?>("@Event").orElse(null)
+            this["@Event"] = value
         }
 
     var eventOperator: EventOperator<*>?
+        get() = this["@EventOperator"]
         set(value) {
-            rootFrame.variables().set("@EventOperator", value)
-        }
-        get() {
-            return rootFrame.variables().get<EventOperator<*>?>("@EventOperator").orElse(null)
+            this["@EventOperator"] = value
         }
 
     var listener: CompletableFuture<Void>?
+        get() = this["@Listener"]
         set(value) {
-            rootFrame.variables().set("@Listener", value)
-        }
-        get() {
-            return rootFrame.variables().get<CompletableFuture<Void>?>("@Listener").orElse(null)
+            this["@Listener"] = value
         }
 
     var sender: CommandSender?
+        get() = this["@Sender"]
         set(value) {
-            rootFrame.variables().set("@Sender", value)
+            this["@Sender"] = value
         }
-        get() {
-            return rootFrame.variables().get<CommandSender?>("@Sender").orElse(null)
+
+    var breakLoop: Boolean
+        get() = get<Boolean>("@BreakLoop") == true
+        set(value) {
+            this["@BreakLoop"] = value
         }
+
+    operator fun set(key: String, value: Any?) {
+        rootFrame.variables().set(key, value)
+    }
+
+    operator fun <T> get(key: String, def: T? = null): T? {
+        return rootFrame.variables().get<T>(key).orElse(def)
+    }
 
     override fun createExecutor() = ScriptSchedulerExecutor
 

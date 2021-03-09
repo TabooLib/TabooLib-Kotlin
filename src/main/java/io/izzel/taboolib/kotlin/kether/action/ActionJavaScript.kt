@@ -34,7 +34,7 @@ class ActionJavaScript(val script: CompiledScript) : QuestAction<Any>() {
                     ).bindings
                 )
             )
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
         }
         return CompletableFuture.completedFuture(r)

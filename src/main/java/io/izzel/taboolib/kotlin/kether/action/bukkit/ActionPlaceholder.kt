@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
 class ActionPlaceholder(val source: ParsedAction<*>) : QuestAction<String>() {
 
     override fun process(context: QuestContext.Frame): CompletableFuture<String> {
-        return context.newFrame(source).run<Any>().thenApplyAsync( {
+        return context.newFrame(source).run<Any>().thenApplyAsync({
             TLocale.Translate.setPlaceholders((context.context() as ScriptContext).sender!!, it.toString().trimIndent())
         }, context.context().executor)
     }

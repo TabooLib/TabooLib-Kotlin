@@ -16,19 +16,19 @@ class ActionJoin(val source: List<ParsedAction<*>>, val separator: String) : Que
 
     override fun process(context: QuestContext.Frame): CompletableFuture<String> {
         val future = CompletableFuture<String>()
-        process(context, future, 0, source, ArrayList())
-        return future;
-    }
-
-    fun process(frame: QuestContext.Frame, future: CompletableFuture<String>, cur: Int, i: List<ParsedAction<*>>, array: ArrayList<Any>) {
-        if (cur < i.size) {
-            frame.newFrame(i[cur]).run<Any>().thenAcceptAsync({
-                array.add(it)
-                process(frame, future, cur + 1, i, array)
-            }, frame.context().executor)
-        } else {
-            future.complete(array.joinToString(separator))
+        val array = ArrayList<Any>()
+        fun process(cur: Int) {
+            if (cur < source.size) {
+                context.newFrame(source[cur]).run<Any>().thenApply {
+                    array.add(it)
+                    process(cur + 1)
+                }
+            } else {
+                future.complete(array.joinToString(separator))
+            }
         }
+        process(0)
+        return future;
     }
 
     override fun toString(): String {
