@@ -1,45 +1,42 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.transform
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
+import io.izzel.taboolib.internal.apache.lang3.time.DateFormatUtils
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.toPrinted
+import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
 
 /**
  * @author IzzelAliz
  */
-class ActionPrinted(val date: ParsedAction<*>, val separator: String) : QuestAction<List<String>>() {
+class ActionFormat(val date: ParsedAction<*>, val format: String) : QuestAction<String>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<List<String>> {
+    override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
         return frame.newFrame(date).run<Any>().thenApply {
-            it.toString().toPrinted(separator)
+            DateFormatUtils.format(Coerce.toLong(it), format)
         }
-    }
-
-    override fun toString(): String {
-        return "ActionPrinted(date=$date, separator='$separator')"
     }
 
     companion object {
 
         /**
-         * printed *xxx by "_"
+         * format *date with "yyyy-MM-dd HH:mm"
          */
-        @KetherParser(["printed"])
+        @KetherParser(["format"])
         fun parser() = ScriptParser.parser {
-            ActionPrinted(it.next(ArgTypes.ACTION), try {
+            ActionFormat(it.next(ArgTypes.ACTION), try {
                 it.mark()
                 it.expects("by", "with")
                 it.nextToken()
             } catch (ignored: Exception) {
                 it.reset()
-                "_"
+                "yyyy/MM/dd HH:mm"
             })
         }
     }

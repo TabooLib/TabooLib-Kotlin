@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.loop
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
@@ -7,6 +7,7 @@ import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.script
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -21,7 +22,12 @@ class ActionJoin(val source: List<ParsedAction<*>>, val separator: String) : Que
             if (cur < source.size) {
                 context.newFrame(source[cur]).run<Any>().thenApply {
                     array.add(it)
-                    process(cur + 1)
+                    if (context.script().breakLoop) {
+                        context.script().breakLoop = false
+                        future.complete(array.joinToString(separator))
+                    } else {
+                        process(cur + 1)
+                    }
                 }
             } else {
                 future.complete(array.joinToString(separator))

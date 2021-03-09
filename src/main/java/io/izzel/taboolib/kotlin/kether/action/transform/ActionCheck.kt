@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.transform
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
@@ -7,7 +7,8 @@ import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherError
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.action.ActionCheck.Symbol.*
+import io.izzel.taboolib.kotlin.kether.action.transform.ActionCheck.Symbol.*
+import io.izzel.taboolib.kotlin.kether.inferType
 import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
 
@@ -23,7 +24,7 @@ class ActionCheck(val left: ParsedAction<*>, val right: ParsedAction<*>, val sym
 
     fun check(left: Any?, right: Any?): Boolean {
         return when (symbol) {
-            EQUALS -> left == right
+            EQUALS -> left.inferType() == right.inferType()
             EQUALS_MEMORY -> left === right
             EQUALS_IGNORE_CASE -> left.toString().equals(right.toString(), ignoreCase = true)
             NOT_EQUALS -> left != right

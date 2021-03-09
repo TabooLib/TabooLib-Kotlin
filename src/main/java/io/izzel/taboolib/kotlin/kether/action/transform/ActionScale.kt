@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.transform
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
@@ -8,32 +8,28 @@ import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
 import io.izzel.taboolib.util.Coerce
 import java.util.concurrent.CompletableFuture
-import kotlin.math.roundToInt
 
 
 /**
  * @author IzzelAliz
  */
-class ActionRound(val number: ParsedAction<*>) : QuestAction<Int>() {
+class ActionScale(val number: ParsedAction<*>) : QuestAction<Double>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<Int> {
+    override fun process(frame: QuestContext.Frame): CompletableFuture<Double> {
         return frame.newFrame(number).run<Any>().thenApply {
-            Coerce.toDouble(it).roundToInt()
+            Coerce.format(Coerce.toDouble(it))
         }
     }
 
     override fun toString(): String {
-        return "ActionRound(number=$number)"
+        return "ActionScale(number=$number)"
     }
 
     companion object {
 
-        /**
-         * round *1.0
-         */
-        @KetherParser(["round"])
+        @KetherParser(["scale", "scaled"])
         fun parser() = ScriptParser.parser {
-            ActionRound(it.next(ArgTypes.ACTION))
+            ActionScale(it.next(ArgTypes.ACTION))
         }
     }
 }

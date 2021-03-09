@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.transform
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 /**
  * TabooLibKotlin
- * io.izzel.taboolib.kotlin.kether.action.ActionRandom
+ * io.izzel.taboolib.kotlin.kether.action.transform.ActionRandom
  *
  * @author sky
  * @since 2021/1/30 9:26 下午

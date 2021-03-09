@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.supplier
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
@@ -10,21 +10,21 @@ import java.util.concurrent.CompletableFuture
 /**
  * @author IzzelAliz
  */
-class ActionNull : QuestAction<Any?>() {
+class ActionPass : QuestAction<String>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<Any?> {
-        return CompletableFuture.completedFuture(null)
+    override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
+        return CompletableFuture.completedFuture("")
     }
 
     override fun toString(): String {
-        return "ActionNull()"
+        return "ActionPass()"
     }
 
     companion object {
 
-        @KetherParser(["null"])
+        @KetherParser(["pass"])
         fun parser() = ScriptParser.parser {
-            ActionNull()
+            ActionPass()
         }
     }
 }

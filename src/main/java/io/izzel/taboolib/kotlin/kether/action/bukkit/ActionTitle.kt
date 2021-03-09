@@ -8,7 +8,7 @@ import io.izzel.taboolib.kotlin.kether.Kether.expects
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
-import io.izzel.taboolib.kotlin.kether.action.ActionPass
+import io.izzel.taboolib.kotlin.kether.action.supplier.ActionPass
 import io.izzel.taboolib.module.locale.TLocale
 import org.bukkit.entity.Player
 import java.util.concurrent.CompletableFuture

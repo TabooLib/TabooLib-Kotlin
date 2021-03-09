@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.transform
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * TabooLibKotlin
- * io.izzel.taboolib.kotlin.kether.action.ActionRange
+ * io.izzel.taboolib.kotlin.kether.action.transform.ActionRange
  *
  * @author sky
  * @since 2021/1/30 9:26 下午

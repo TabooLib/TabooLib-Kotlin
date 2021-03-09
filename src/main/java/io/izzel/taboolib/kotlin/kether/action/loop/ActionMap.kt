@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.loop
 
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
@@ -6,6 +6,7 @@ import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.script
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -24,7 +25,13 @@ class ActionMap(val key: String, val values: ParsedAction<*>, val action: Parsed
                         if (map != null) {
                             result += map
                         }
-                        process(cur + 1, i)
+                        if (context.script().breakLoop) {
+                            context.script().breakLoop = false
+                            context.variables().remove(key)
+                            future.complete(result)
+                        } else {
+                            process(cur + 1, i)
+                        }
                     }
                 } else {
                     context.variables().remove(key)

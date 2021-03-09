@@ -1,30 +1,31 @@
-package io.izzel.taboolib.kotlin.kether.action
+package io.izzel.taboolib.kotlin.kether.action.loop
 
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.script
 import java.util.concurrent.CompletableFuture
-
 
 /**
  * @author IzzelAliz
  */
-class ActionPass : QuestAction<String>() {
+class ActionBreak : QuestAction<Void>() {
 
-    override fun process(frame: QuestContext.Frame): CompletableFuture<String> {
-        return CompletableFuture.completedFuture("")
+    override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
+        context.script().breakLoop = true
+        return CompletableFuture.completedFuture(null)
     }
 
     override fun toString(): String {
-        return "ActionPass()"
+        return "ActionBreak()"
     }
 
     companion object {
 
-        @KetherParser(["pass"])
+        @KetherParser(["break"])
         fun parser() = ScriptParser.parser {
-            ActionPass()
+            ActionBreak()
         }
     }
 }
