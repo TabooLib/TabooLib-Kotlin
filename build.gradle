@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.izzel.taboolib.kotlin'
-version = '1.0.42'
+version = '1.0.43'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'

@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets
 class Workspace(val file: File, val extension: String = ".ks", val namespace: List<String> = emptyList()) {
 
     val scripts = HashMap<String, Quest>()
-    val scriptsSetting = HashMap<String, Map<String, Any>>()
+    val scriptsSetting = HashMap<String, Map<String, Any?>>()
     val runningScripts = MultimapBuilder.hashKeys().arrayListValues().build<String, ScriptContext>()!!
 
     val listeners = ArrayList<AutoCloseable>()
@@ -72,7 +72,7 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
                     action.process(context.rootFrame())
                 }
             }
-            scriptsSetting[quest.id] = context.rootFrame().variables().values().map { it.key to it.value }.toMap()
+            scriptsSetting[quest.id] = context.rootFrame().deepVars()
         }
     }
 

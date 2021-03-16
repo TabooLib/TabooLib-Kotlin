@@ -1,4 +1,4 @@
-package io.izzel.taboolib.kotlin
+package io.izzel.taboolib.kotlin.bukkit
 
 import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Reflex.Companion.toReflex
@@ -6,92 +6,32 @@ import io.izzel.taboolib.module.packet.TPacketHandler
 import net.minecraft.server.v1_16_R3.*
 import org.bukkit.entity.Player
 
-class NMSImpl: AbsNMS() {
-    val colors = listOf(
-        "§0",
-        "§1",
-        "§2",
-        "§3",
-        "§4",
-        "§5",
-        "§6",
-        "§7",
-        "§8",
-        "§9",
-        "§a",
-        "§b",
-        "§c",
-        "§d",
-        "§e",
-        "§f",
-        "§g",
-        "§h",
-        "§i",
-        "§j",
-//        "§k",
-//        "§l",
-//        "§m",
-//        "§n",
-//        "§o",
-        "§p",
-        "§q",
-        "§r",
-        "§s",
-        "§t",
-        "§u",
-        "§v",
-        "§w",
-        "§x",
-        "§y",
-        "§z",
-        "§啊",
-        "§阿",
-        "§锕",
-        "§爱",
-        "§哎",
-        "§艾",
-        "§埃",
-        "§唉",
-        "§挨",
-        "§矮",
-        "§版",
-        "§草",
-        "§对",
-        "§饿",
-        "§发",
-        "§哥",
-        "§好",
-        "§加",
-        "§看",
-        "§了",
-        "§没",
-    )
+class InternalImpl : Internal() {
 
-    override fun setupScoreboard(player: Player) {
+    override fun setupScoreboard(player: Player, remove: Boolean) {
         val packet = PacketPlayOutScoreboardObjective()
         val reflex = packet.toReflex()
-        reflex.set("a", "BCSB")
+        reflex.set("a", if (remove) "REMOVE" else "BCSB")
         if (Version.isAfter(Version.v1_13)) {
             reflex.set("b", ChatComponentText("ScoreBoard"))
-        }else {
+        } else {
             reflex.set("b", "ScoreBoard")
         }
         reflex.set("c", IScoreboardCriteria.EnumScoreboardHealthDisplay.INTEGER)
         reflex.set("d", 0)
         TPacketHandler.sendPacket(player, packet)
         initTeam(player)
-        initLines(player, colors.size)
+        initLines(player, uniqueColors.size)
     }
 
-    override fun changeContent(player: Player, content: String, lastLineCount: Int) {
-        val lines = content.lines()
-
-        if(lines.size != lastLineCount) {
-            updateLines(player, lines.size, lastLineCount)
+    override fun changeContent(player: Player, content: List<String>, lastContent: Map<Int, String>) {
+        if (content.size != lastContent.size) {
+            updateLines(player, content.size, lastContent.size)
         }
-
-        for ((line, ct) in lines.withIndex()) {
-            sendTeamPrefixSuffix(player, colors[lines.size - line -1], ct)
+        content.forEachIndexed { line, ct ->
+            if (ct != lastContent[line]) {
+                sendTeamPrefixSuffix(player, uniqueColors[content.size - line - 1], ct)
+            }
         }
     }
 
@@ -109,14 +49,13 @@ class NMSImpl: AbsNMS() {
         reflex.set("a", "BCSB")
         if (Version.isAfter(Version.v1_13)) {
             reflex.set("b", ChatComponentText(title))
-        }else {
+        } else {
             reflex.set("b", title)
         }
         reflex.set("c", IScoreboardCriteria.EnumScoreboardHealthDisplay.INTEGER)
         reflex.set("d", 2)
         TPacketHandler.sendPacket(player, packet)
     }
-
 
     /**
      *
@@ -148,8 +87,8 @@ class NMSImpl: AbsNMS() {
      * @see PacketPlayOutScoreboardTeam
      */
     private fun initTeam(player: Player) {
-        for (color in colors) {
-            if (Version.isAfter(Version.v1_13)){
+        uniqueColors.forEachIndexed { idx, color ->
+            if (Version.isAfter(Version.v1_13)) {
                 val packet = PacketPlayOutScoreboardTeam()
                 val reflex = packet.toReflex()
                 reflex.set("a", color)
@@ -161,7 +100,7 @@ class NMSImpl: AbsNMS() {
                 reflex.set("i", 0)
                 reflex.set("j", -1)
                 TPacketHandler.sendPacket(player, packet)
-                continue
+                return@forEachIndexed
             }
             val packet = PacketPlayOutScoreboardTeam()
             val reflex = packet.toReflex()
@@ -177,17 +116,16 @@ class NMSImpl: AbsNMS() {
 
     private fun initLines(player: Player, line: Int) {
         validateLines(line)
-        for ((num, str) in colors.withIndex()) {
+        uniqueColors.forEachIndexed { num, str ->
             if (num > line) {
                 return
             }
-            val score = (num)
             if (Version.isAfter(Version.v1_13)) {
                 val packet = PacketPlayOutScoreboardScore()
                 val reflex = packet.toReflex()
                 reflex.set("a", str)
                 reflex.set("b", "BCSB")
-                reflex.set("c", score)
+                reflex.set("c", num)
                 reflex.set("d", ScoreboardServer.Action.CHANGE)
                 TPacketHandler.sendPacket(player, packet)
                 return
@@ -196,20 +134,20 @@ class NMSImpl: AbsNMS() {
             val reflex = packet.toReflex()
             reflex.set("a", str)
             reflex.set("b", "BCSB")
-            reflex.set("c", score)
+            reflex.set("c", num)
             reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.CHANGE)
             TPacketHandler.sendPacket(player, packet)
         }
     }
 
     private fun validateLines(line: Int) {
-        if(colors.size < line) {
+        if (uniqueColors.size < line) {
             throw IllegalArgumentException("Lines size are larger than supported.")
         }
     }
 
     private fun sendTeamPrefixSuffix(player: Player, team: String, prefix: String) {
-        if (Version.isAfter(Version.v1_13)){
+        if (Version.isAfter(Version.v1_13)) {
             val packet = PacketPlayOutScoreboardTeam()
             val reflex = packet.toReflex()
             reflex.set("a", team)
@@ -242,40 +180,40 @@ class NMSImpl: AbsNMS() {
 
     private fun updateLines(player: Player, line: Int, lastLineCount: Int) {
         validateLines(line)
-        if(line > lastLineCount) {
-            for (i in lastLineCount until line) {
+        if (line > lastLineCount) {
+            (lastLineCount until line).forEach { i ->
                 if (Version.isAfter(Version.v1_13)) {
                     val packet = PacketPlayOutScoreboardScore()
                     val reflex = packet.toReflex()
-                    reflex.set("a", colors[i])
+                    reflex.set("a", uniqueColors[i])
                     reflex.set("b", "BCSB")
                     reflex.set("c", i)
                     reflex.set("d", ScoreboardServer.Action.CHANGE)
                     TPacketHandler.sendPacket(player, packet)
-                    continue
+                    return@forEach
                 }
                 val packet = PacketPlayOutScoreboardScore()
                 val reflex = packet.toReflex()
-                reflex.set("a", colors[i])
+                reflex.set("a", uniqueColors[i])
                 reflex.set("b", "BCSB")
                 reflex.set("c", i)
                 reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.CHANGE)
                 TPacketHandler.sendPacket(player, packet)
             }
         } else {
-            for (i in line until lastLineCount) {
+            (line until lastLineCount).forEach { i ->
                 if (Version.isAfter(Version.v1_13)) {
                     val packet = PacketPlayOutScoreboardScore()
                     val reflex = packet.toReflex()
-                    reflex.set("a", colors[i])
+                    reflex.set("a", uniqueColors[i])
                     reflex.set("b", "BCSB")
                     reflex.set("d", ScoreboardServer.Action.REMOVE)
                     TPacketHandler.sendPacket(player, packet)
-                    continue
+                    return@forEach
                 }
                 val packet = PacketPlayOutScoreboardScore()
                 val reflex = packet.toReflex()
-                reflex.set("a", colors[i])
+                reflex.set("a", uniqueColors[i])
                 reflex.set("b", "BCSB")
                 reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.REMOVE)
                 TPacketHandler.sendPacket(player, packet)

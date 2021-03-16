@@ -46,8 +46,8 @@ class ScriptService : QuestService<ScriptContext> {
         return Optional.ofNullable(mainspace.scripts[id])
     }
 
-    override fun getQuestSettings(id: String): Map<String, Any> {
-        return Collections.unmodifiableMap(mainspace.scriptsSetting.getOrDefault(id, ImmutableMap.of()))
+    override fun getQuestSettings(id: String): Map<String, Any?> {
+        return Collections.unmodifiableMap(mainspace.scriptsSetting.getOrDefault(id, ImmutableMap.of()))!!
     }
 
     override fun getQuests(): Map<String, Quest> {

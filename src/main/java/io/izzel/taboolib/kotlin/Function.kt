@@ -37,8 +37,12 @@ fun String.toPrinted(separator: String = ""): List<String> {
 }
 
 fun Any.asMap() = when (this) {
-    is Map<*, *> -> this.map { (k, v) -> k.toString() to v }.toMap()
-    is ConfigurationSection -> this.getValues(false)
+    is Map<*, *> -> {
+        this.map { (k, v) -> k.toString() to v }.toMap()
+    }
+    is ConfigurationSection -> {
+        this.getValues(false)
+    }
     else -> null
 }
 
