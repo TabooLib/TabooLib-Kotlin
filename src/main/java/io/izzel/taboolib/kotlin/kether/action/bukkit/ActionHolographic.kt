@@ -3,6 +3,7 @@ package io.izzel.taboolib.kotlin.kether.action.bukkit
 import io.izzel.kether.common.api.ParsedAction
 import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
+import io.izzel.taboolib.kotlin.asList
 import io.izzel.taboolib.kotlin.kether.KetherParser
 import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
@@ -20,7 +21,8 @@ class ActionHolographic(val message: ParsedAction<*>, val location: ParsedAction
         return context.newFrame(message).run<Any>().thenAccept { text ->
             context.newFrame(location).run<Location>().thenAccept { loc ->
                 val viewer = ((context.context() as ScriptContext).sender as? Player) ?: throw RuntimeException("No player selected.")
-                viewer.sendHolographic(loc, *text.toString().trimIndent().split("\n").toTypedArray())
+                val body = if (text is List<*>) text.asList() else text.toString().trimIndent().split("\n")
+                viewer.sendHolographic(loc, *body.toTypedArray())
             }
         }
     }
@@ -34,7 +36,7 @@ class ActionHolographic(val message: ParsedAction<*>, val location: ParsedAction
         /**
          * holographic *"123" at location 0 0 0
          */
-        @KetherParser(["toast"])
+        @KetherParser(["holographic"])
         fun parser() = ScriptParser.parser {
             val text = it.nextAction<Any>()
             it.expect("at")
