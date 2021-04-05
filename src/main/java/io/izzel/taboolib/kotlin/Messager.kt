@@ -1,9 +1,7 @@
 package io.izzel.taboolib.kotlin
 
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import io.izzel.taboolib.TabooLib
+import io.izzel.taboolib.internal.gson.JsonObject
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflex
 import io.izzel.taboolib.kotlin.Reflex.Companion.reflexInvoke
 import io.izzel.taboolib.kotlin.Reflex.Companion.static
@@ -26,10 +24,13 @@ import java.util.concurrent.ConcurrentHashMap
 
 @PlayerContainer
 private val holographicMap = ConcurrentHashMap<String, MutableMap<String, Holographic>>()
+
 @PlayerContainer
 private val scoreboardMap = ConcurrentHashMap<String, Scoreboard>()
 
 private val toastMap = ConcurrentHashMap<Toast, NamespacedKey>()
+
+private val classJsonElement = Class.forName("com.google.gson.JsonElement")
 
 /**
  * 发送记分板数据包
@@ -118,7 +119,9 @@ private fun revoke(player: Player, key: NamespacedKey) {
 private fun inject(key: NamespacedKey, toast: String): NamespacedKey {
     if (getAdvancement(key) == null) {
         val localMinecraftKey = obcClass("util.CraftNamespacedKey").staticInvoke<Any>("toMinecraft", key)
-        val localJsonObject = nmsClass("AdvancementDataWorld").static<Gson>("DESERIALIZER")!!.fromJson(toast, JsonElement::class.java).asJsonObject
+        val localJsonObject = nmsClass("AdvancementDataWorld").static<Any>("DESERIALIZER")!!
+            .reflexInvoke<Any>("fromJson", toast, classJsonElement)!!
+            .reflexInvoke<Any>("getAsJsonObject")
         val localMinecraftServer = nmsClass("MinecraftServer").staticInvoke<Any>("getServer")!!
         val localLootPredicateManager = localMinecraftServer.reflexInvoke<Any>("getLootPredicateManager")
         val localSerializedAdvancement = nmsClass("Advancement\$SerializedAdvancement").staticInvoke<Any>(
