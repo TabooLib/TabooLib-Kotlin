@@ -11,7 +11,7 @@ class InternalImpl : Internal() {
     override fun setupScoreboard(player: Player, remove: Boolean) {
         val packet = PacketPlayOutScoreboardObjective()
         val reflex = packet.toReflex()
-        reflex.set("a", if (remove) "REMOVE" else "BCSB")
+        reflex.set("a", if (remove) "REMOVE" else "TabooScore")
         if (Version.isAfter(Version.v1_13)) {
             reflex.set("b", ChatComponentText("ScoreBoard"))
         } else {
@@ -21,15 +21,14 @@ class InternalImpl : Internal() {
         reflex.set("d", 0)
         TPacketHandler.sendPacket(player, packet)
         initTeam(player)
-        initLines(player, uniqueColors.size)
     }
 
     override fun changeContent(player: Player, content: List<String>, lastContent: Map<Int, String>) {
         if (content.size != lastContent.size) {
-            updateLines(player, content.size, lastContent.size)
+            updateLineCount(player, content.size, lastContent.size)
         }
         content.forEachIndexed { line, ct ->
-            if (ct != lastContent[line]) {
+            if (ct != lastContent[content.size - line - 1]) {
                 sendTeamPrefixSuffix(player, uniqueColors[content.size - line - 1], ct)
             }
         }
@@ -39,14 +38,14 @@ class InternalImpl : Internal() {
         val packet = PacketPlayOutScoreboardDisplayObjective()
         val reflex = packet.toReflex()
         reflex.set("a", 1)
-        reflex.set("b", "BCSB")
+        reflex.set("b", "TabooScore")
         TPacketHandler.sendPacket(player, packet)
     }
 
     override fun setDisplayName(player: Player, title: String) {
         val packet = PacketPlayOutScoreboardObjective()
         val reflex = packet.toReflex()
-        reflex.set("a", "BCSB")
+        reflex.set("a", "TabooScore")
         if (Version.isAfter(Version.v1_13)) {
             reflex.set("b", ChatComponentText(title))
         } else {
@@ -87,7 +86,7 @@ class InternalImpl : Internal() {
      * @see PacketPlayOutScoreboardTeam
      */
     private fun initTeam(player: Player) {
-        uniqueColors.forEachIndexed { idx, color ->
+        uniqueColors.forEachIndexed { _, color ->
             if (Version.isAfter(Version.v1_13)) {
                 val packet = PacketPlayOutScoreboardTeam()
                 val reflex = packet.toReflex()
@@ -114,79 +113,50 @@ class InternalImpl : Internal() {
         }
     }
 
-    private fun initLines(player: Player, line: Int) {
-        validateLines(line)
-        uniqueColors.forEachIndexed { num, str ->
-            if (num > line) {
-                return
-            }
-            if (Version.isAfter(Version.v1_13)) {
-                val packet = PacketPlayOutScoreboardScore()
-                val reflex = packet.toReflex()
-                reflex.set("a", str)
-                reflex.set("b", "BCSB")
-                reflex.set("c", num)
-                reflex.set("d", ScoreboardServer.Action.CHANGE)
-                TPacketHandler.sendPacket(player, packet)
-                return
-            }
-            val packet = PacketPlayOutScoreboardScore()
-            val reflex = packet.toReflex()
-            reflex.set("a", str)
-            reflex.set("b", "BCSB")
-            reflex.set("c", num)
-            reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.CHANGE)
-            TPacketHandler.sendPacket(player, packet)
-        }
-    }
-
-    private fun validateLines(line: Int) {
+    private fun validateLineCount(line: Int) {
         if (uniqueColors.size < line) {
             throw IllegalArgumentException("Lines size are larger than supported.")
         }
     }
 
-    private fun sendTeamPrefixSuffix(player: Player, team: String, prefix: String) {
+    /**
+     * @param team 为\[content.size - line - 1\]
+     */
+    private fun sendTeamPrefixSuffix(player: Player, team: String, content: String) {
         if (Version.isAfter(Version.v1_13)) {
             val packet = PacketPlayOutScoreboardTeam()
             val reflex = packet.toReflex()
             reflex.set("a", team)
-            reflex.set("c", ChatComponentText(prefix))
+            reflex.set("c", ChatComponentText(content))
             reflex.set("i", 2)
             TPacketHandler.sendPacket(player, packet)
             return
         }
-        var p = prefix
-        var s = ""
+        var prefix = content
+        var suffix = ""
 
-        if (prefix.length > 16) {
-            p = prefix.substring(0 until 16)
-            s = prefix.substring(16 until prefix.length)
+        if (content.length > 16) {
+            prefix = content.substring(0 until 16)
+            suffix = content.substring(16 until content.length)
         }
         val packet = PacketPlayOutScoreboardTeam()
         val reflex = packet.toReflex()
         reflex.set("a", team)
         reflex.set("h", 2)
-        reflex.set("c", p)
+        reflex.set("c", prefix)
+        reflex.set("d", suffix)
         TPacketHandler.sendPacket(player, packet)
-
-        val packetSuffix = PacketPlayOutScoreboardTeam()
-        val reflexSuffix = packetSuffix.toReflex()
-        reflexSuffix.set("a", team)
-        reflexSuffix.set("h", 2)
-        reflexSuffix.set("d", s)
-        TPacketHandler.sendPacket(player, packetSuffix)
     }
 
-    private fun updateLines(player: Player, line: Int, lastLineCount: Int) {
-        validateLines(line)
+    private fun updateLineCount(player: Player, line: Int, lastLineCount: Int) {
+        validateLineCount(line)
         if (line > lastLineCount) {
             (lastLineCount until line).forEach { i ->
                 if (Version.isAfter(Version.v1_13)) {
                     val packet = PacketPlayOutScoreboardScore()
                     val reflex = packet.toReflex()
                     reflex.set("a", uniqueColors[i])
-                    reflex.set("b", "BCSB")
+                    reflex.set("b", "TabooScore")
                     reflex.set("c", i)
                     reflex.set("d", ScoreboardServer.Action.CHANGE)
                     TPacketHandler.sendPacket(player, packet)
@@ -195,7 +165,7 @@ class InternalImpl : Internal() {
                 val packet = PacketPlayOutScoreboardScore()
                 val reflex = packet.toReflex()
                 reflex.set("a", uniqueColors[i])
-                reflex.set("b", "BCSB")
+                reflex.set("b", "TabooScore")
                 reflex.set("c", i)
                 reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.CHANGE)
                 TPacketHandler.sendPacket(player, packet)
@@ -206,7 +176,7 @@ class InternalImpl : Internal() {
                     val packet = PacketPlayOutScoreboardScore()
                     val reflex = packet.toReflex()
                     reflex.set("a", uniqueColors[i])
-                    reflex.set("b", "BCSB")
+                    reflex.set("b", "TabooScore")
                     reflex.set("d", ScoreboardServer.Action.REMOVE)
                     TPacketHandler.sendPacket(player, packet)
                     return@forEach
@@ -214,7 +184,7 @@ class InternalImpl : Internal() {
                 val packet = PacketPlayOutScoreboardScore()
                 val reflex = packet.toReflex()
                 reflex.set("a", uniqueColors[i])
-                reflex.set("b", "BCSB")
+                reflex.set("b", "TabooScore")
                 reflex.set("d", net.minecraft.server.v1_12_R1.PacketPlayOutScoreboardScore.EnumScoreboardAction.REMOVE)
                 TPacketHandler.sendPacket(player, packet)
             }
