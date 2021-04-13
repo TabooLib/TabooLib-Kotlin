@@ -19,7 +19,7 @@ class Mirror {
     fun mirrorFuture(id: String, func: MirrorFuture.() -> Unit) {
         func(MirrorFuture().also { mf ->
             mf.future.thenApply {
-                dataMap[id]?.finish(mf.startTime)
+                dataMap.computeIfAbsent(id) { MirrorData() }.finish(mf.startTime)
             }
         })
     }
