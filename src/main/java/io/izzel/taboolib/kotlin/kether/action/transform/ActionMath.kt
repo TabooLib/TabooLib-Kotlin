@@ -89,7 +89,6 @@ class ActionMath(val type: Type, val array: List<ParsedAction<*>>) : QuestAction
          */
         @KetherParser(["math"])
         fun parser0() = ScriptParser.parser {
-            it.next(ArgTypes.listOf(ArgTypes.ACTION))
             ActionMath(when (it.expects(
                 "add", "plus", "+",
                 "sub", "minus", "-",
