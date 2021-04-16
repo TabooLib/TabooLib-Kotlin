@@ -100,7 +100,7 @@ inline fun <T> Iterable<T>.subByDouble(selector: (T) -> Double): Double {
 }
 
 inline fun <T> Iterable<T>.mulBy(selector: (T) -> Int): Int {
-    var sum = 0
+    var sum = 1
     for (element in this) {
         sum *= selector(element)
     }
@@ -108,7 +108,7 @@ inline fun <T> Iterable<T>.mulBy(selector: (T) -> Int): Int {
 }
 
 inline fun <T> Iterable<T>.mulByDouble(selector: (T) -> Double): Double {
-    var sum = 0.0
+    var sum = 1.0
     for (element in this) {
         sum *= selector(element)
     }
@@ -116,17 +116,21 @@ inline fun <T> Iterable<T>.mulByDouble(selector: (T) -> Double): Double {
 }
 
 inline fun <T> Iterable<T>.divBy(selector: (T) -> Int): Int {
-    var sum = 0
-    for (element in this) {
-        sum /= selector(element)
+    var sum = selector(firstOrNull() ?: return 0)
+    forEachIndexed { index, element ->
+        if (index > 0) {
+            sum /= selector(element)
+        }
     }
     return sum
 }
 
 inline fun <T> Iterable<T>.divByDouble(selector: (T) -> Double): Double {
-    var sum = 0.0
-    for (element in this) {
-        sum /= selector(element)
+    var sum = selector(firstOrNull() ?: return 0.0)
+    forEachIndexed { index, element ->
+        if (index > 0) {
+            sum /= selector(element)
+        }
     }
     return sum
 }
