@@ -10,7 +10,6 @@ import io.izzel.taboolib.kotlin.bukkit.Internal
 import io.izzel.taboolib.module.hologram.Hologram
 import io.izzel.taboolib.module.hologram.THologram
 import io.izzel.taboolib.module.inject.PlayerContainer
-import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.util.Reflection
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getAdvancement
@@ -34,23 +33,16 @@ private val classJsonElement = Class.forName("com.google.gson.JsonElement")
 
 /**
  * 发送记分板数据包
- * @param title 记分板标题（设置为空时注销记分板）
- * @param content 记分板内容
+ * @param content 记分板内容（设置为空时注销记分板）
  */
-fun Player.sendScoreboard(title: String?, vararg content: String) {
-    when {
-        title == null -> {
-            sendScoreboard("null")
+fun Player.sendScoreboard(vararg content: String) {
+    if (scoreboardMap.containsKey(name)) {
+        scoreboardMap[name]?.run {
+            sendTitle(this@sendScoreboard, content.firstOrNull().toString())
+            sendContent(this@sendScoreboard, content.filterIndexed { index, _ -> index > 0 }.colored())
         }
-        scoreboardMap.containsKey(name) -> {
-            scoreboardMap[name]?.run {
-                sendTitle(this@sendScoreboard, title)
-                sendContent(this@sendScoreboard, TLocale.Translate.setColored(content.toList()))
-            }
-        }
-        else -> {
-            scoreboardMap[name] = Scoreboard(this, title, TLocale.Translate.setColored(content.toList()))
-        }
+    } else {
+        scoreboardMap[name] = Scoreboard(this, content.firstOrNull().toString(), content.filterIndexed { index, _ -> index > 0 }.colored())
     }
 }
 
@@ -60,14 +52,25 @@ fun Player.sendScoreboard(title: String?, vararg content: String) {
  * @param message 信息
  */
 fun Player.sendHolographic(location: Location, vararg message: String) {
+    sendHolographic(location, *message)
+}
+
+/**
+ * 以全息形式发送位于世界中的提示信息
+ * @param location 坐标
+ * @param delay 持续事件
+ * @param transfer 格式化
+ * @param message 信息
+ */
+fun Player.sendHolographic(location: Location, delay: Long = 40L, transfer: (String) -> (String) = { it }, vararg message: String) {
     val key = "${location.world!!.name},${location.x},${location.y},${location.z}"
     val messages = holographicMap.computeIfAbsent(name) { ConcurrentHashMap() }
     if (messages.containsKey(key)) {
         return
     }
-    val holographic = Holographic(this, location, TLocale.Translate.setColored(message.toList()))
+    val holographic = Holographic(this, location, message.toList().colored(), transfer)
     messages[key] = holographic
-    Tasks.delay(40) {
+    Tasks.delay(delay) {
         messages.remove(key)
         holographic.cancel()
     }
@@ -225,7 +228,7 @@ private class Toast(val material: Material, val message: String, val frame: Toas
 /**
  * 全息警示缓存
  */
-private class Holographic(val player: Player, val location: Location, val message: List<String>) {
+private class Holographic(val player: Player, val location: Location, val message: List<String>, val transfer: (String) -> (String)) {
 
     val holograms = ArrayList<Hologram>()
     val time = System.currentTimeMillis()
@@ -235,7 +238,7 @@ private class Holographic(val player: Player, val location: Location, val messag
             holograms.add(THologram.create(location.clone().add(0.0, (((message.size - 1) - index) * 0.3), 0.0), content).also {
                 if (content.isNotEmpty()) {
                     it.addViewer(player)
-                    it.flash(content.toPrinted("_"), 1)
+                    it.flash(content.toPrinted("_").map(transfer), 1)
                 }
             })
         }

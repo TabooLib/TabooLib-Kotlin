@@ -20,7 +20,7 @@ class ActionScoreboard(val content: ParsedAction<*>) : QuestAction<Void>() {
         return context.newFrame(content).run<Any>().thenAccept { content ->
             val viewer = ((context.context() as ScriptContext).sender as? Player) ?: throw RuntimeException("No player selected.")
             if (content == null) {
-                viewer.sendScoreboard(null)
+                viewer.sendScoreboard()
             } else {
                 val body = if (content is List<*>) content.asList() else content.toString().trimIndent().split("\n")
                 viewer.sendScoreboard(body[0], *body.filterIndexed { index, _ -> index > 0 }.toTypedArray())

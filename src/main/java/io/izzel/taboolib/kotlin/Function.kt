@@ -82,3 +82,51 @@ fun List<String>.colored() = TLocale.Translate.setColored(this).toList()
 fun CommandSender.sendLocale(node: String, vararg args: Any) {
     TLocale.sendTo(this, node, *args)
 }
+
+inline fun <T> Iterable<T>.subBy(selector: (T) -> Int): Int {
+    var sum = 0
+    for (element in this) {
+        sum -= selector(element)
+    }
+    return sum
+}
+
+inline fun <T> Iterable<T>.subByDouble(selector: (T) -> Double): Double {
+    var sum = 0.0
+    for (element in this) {
+        sum -= selector(element)
+    }
+    return sum
+}
+
+inline fun <T> Iterable<T>.mulBy(selector: (T) -> Int): Int {
+    var sum = 0
+    for (element in this) {
+        sum *= selector(element)
+    }
+    return sum
+}
+
+inline fun <T> Iterable<T>.mulByDouble(selector: (T) -> Double): Double {
+    var sum = 0.0
+    for (element in this) {
+        sum *= selector(element)
+    }
+    return sum
+}
+
+inline fun <T> Iterable<T>.divBy(selector: (T) -> Int): Int {
+    var sum = 0
+    for (element in this) {
+        sum /= selector(element)
+    }
+    return sum
+}
+
+inline fun <T> Iterable<T>.divByDouble(selector: (T) -> Double): Double {
+    var sum = 0.0
+    for (element in this) {
+        sum /= selector(element)
+    }
+    return sum
+}
