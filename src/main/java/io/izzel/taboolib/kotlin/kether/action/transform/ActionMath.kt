@@ -79,6 +79,7 @@ class ActionMath(val type: Type, val array: List<ParsedAction<*>>) : QuestAction
                 future.complete(type.exec(number))
             }
         }
+        process(0)
         return future
     }
 
