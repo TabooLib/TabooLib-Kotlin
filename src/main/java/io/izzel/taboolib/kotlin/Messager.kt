@@ -52,7 +52,7 @@ fun Player.sendScoreboard(vararg content: String) {
  * @param message 信息
  */
 fun Player.sendHolographic(location: Location, vararg message: String) {
-    sendHolographic(location, *message)
+    sendHolographic(location, 40, { it }, *message)
 }
 
 /**
