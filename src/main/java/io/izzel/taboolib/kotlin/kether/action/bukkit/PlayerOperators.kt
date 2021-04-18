@@ -73,9 +73,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 p.teleport(p.location.also {
-                    if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                    if (a == Symbol.ADD) {
                         it.pitch += io.izzel.taboolib.util.Coerce.toFloat(v)
-                    } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                    } else if (a == Symbol.SET) {
                         it.pitch = io.izzel.taboolib.util.Coerce.toFloat(v)
                     }
                 })
@@ -248,6 +248,20 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         PlayerOperator(
             read = {
                 it.isGliding
+            },
+            write = { p, _, v ->
+                p.isGliding = io.izzel.taboolib.util.Coerce.toBoolean(v)
+            }
+        )
+    ),
+
+    GLOWING(
+        PlayerOperator(
+            read = {
+                it.isGlowing
+            },
+            write = { p, _, v ->
+                p.isGlowing = io.izzel.taboolib.util.Coerce.toBoolean(v)
             }
         )
     ),
@@ -256,6 +270,20 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         PlayerOperator(
             read = {
                 it.isSwimming
+            },
+            write = { p, _, v ->
+                p.isSwimming = io.izzel.taboolib.util.Coerce.toBoolean(v)
+            }
+        )
+    ),
+
+    WHITELIST(
+        PlayerOperator(
+            read = {
+                it.isWhitelisted
+            },
+            write = { p, _, v ->
+                p.isWhitelisted = io.izzel.taboolib.util.Coerce.toBoolean(v)
             }
         )
     ),
@@ -280,6 +308,17 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         PlayerOperator(
             read = {
                 it.sleepTicks
+            }
+        )
+    ),
+
+    SLEEP_IGNORED(
+        PlayerOperator(
+            read = {
+                it.isSleepingIgnored
+            },
+            write = { p, _, v ->
+                p.isSleepingIgnored = io.izzel.taboolib.util.Coerce.toBoolean(v)
             }
         )
     ),
@@ -324,6 +363,17 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         )
     ),
 
+    JUMPING(
+        PlayerOperator(
+            read = {
+                it.isJumping
+            },
+            write = { p, _, v ->
+                p.isJumping = io.izzel.taboolib.util.Coerce.toBoolean(v)
+            }
+        )
+    ),
+
     OP(
         PlayerOperator(
             read = {
@@ -358,6 +408,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         PlayerOperator(
             read = {
                 it.playerTime
+            },
+            write = { p, a, v ->
+                p.setPlayerTime(io.izzel.taboolib.util.Coerce.toLong(v), a == Symbol.ADD)
             }
         )
     ),
@@ -378,15 +431,31 @@ enum class PlayerOperators(val operator: PlayerOperator) {
         )
     ),
 
+    LAST_LOGIN(
+        PlayerOperator(
+            read = {
+                it.lastLogin
+            }
+        )
+    ),
+
+    LAST_SEEN(
+        PlayerOperator(
+            read = {
+                it.lastSeen
+            }
+        )
+    ),
+
     ABSORPTION_AMOUNT(
         PlayerOperator(
             read = {
                 it.absorptionAmount
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.absorptionAmount += io.izzel.taboolib.util.Coerce.toDouble(v)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.absorptionAmount = io.izzel.taboolib.util.Coerce.toDouble(v)
                 }
             }
@@ -399,9 +468,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
                 it.noDamageTicks
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.noDamageTicks += io.izzel.taboolib.util.Coerce.toInteger(v)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.noDamageTicks = io.izzel.taboolib.util.Coerce.toInteger(v)
                 }
             }
@@ -415,9 +484,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val d = io.izzel.taboolib.util.Coerce.toInteger(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.remainingAir = (p.remainingAir + d).coerceAtMost(20).coerceAtLeast(0)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.remainingAir = d.coerceAtMost(20).coerceAtLeast(0)
                 }
             }
@@ -431,9 +500,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val d = io.izzel.taboolib.util.Coerce.toInteger(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.maximumAir = (p.maximumAir + d).coerceAtMost(20).coerceAtLeast(0)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.maximumAir = d.coerceAtMost(20).coerceAtLeast(0)
                 }
             }
@@ -470,9 +539,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
                 io.izzel.taboolib.cronus.CronusUtils.getTotalExperience(it)
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.giveExp(io.izzel.taboolib.util.Coerce.toInteger(v))
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     io.izzel.taboolib.cronus.CronusUtils.setTotalExperience(p, io.izzel.taboolib.util.Coerce.toInteger(v))
                 }
             }
@@ -485,9 +554,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
                 it.level
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.level += io.izzel.taboolib.util.Coerce.toInteger(v)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.level = io.izzel.taboolib.util.Coerce.toInteger(v)
                 }
             }
@@ -501,9 +570,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val f = io.izzel.taboolib.util.Coerce.toFloat(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.exhaustion = (p.exhaustion + f).coerceAtMost(20f).coerceAtLeast(0f)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.exhaustion = f.coerceAtMost(20f).coerceAtLeast(0f)
                 }
             }
@@ -517,9 +586,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val f = io.izzel.taboolib.util.Coerce.toFloat(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.saturation = (p.saturation + f).coerceAtMost(20f).coerceAtLeast(0f)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.saturation = f.coerceAtMost(20f).coerceAtLeast(0f)
                 }
             }
@@ -533,9 +602,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val d = io.izzel.taboolib.util.Coerce.toInteger(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.foodLevel = (p.foodLevel + d).coerceAtMost(20).coerceAtLeast(0)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.foodLevel = d.coerceAtMost(20).coerceAtLeast(0)
                 }
             }
@@ -549,9 +618,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val d = io.izzel.taboolib.util.Coerce.toDouble(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.health = (p.health + d).coerceAtMost(p.maxHealth).coerceAtLeast(0.0)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.health = d.coerceAtMost(p.maxHealth).coerceAtLeast(0.0)
                 }
             }
@@ -564,9 +633,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
                 it.maxHealth
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.maxHealth += io.izzel.taboolib.util.Coerce.toDouble(v)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.maxHealth = io.izzel.taboolib.util.Coerce.toDouble(v)
                 }
             }
@@ -602,9 +671,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val f = io.izzel.taboolib.util.Coerce.toFloat(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.flySpeed = (p.flySpeed + f).coerceAtMost(0.99f).coerceAtLeast(0f)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.flySpeed = f.coerceAtMost(0.99f).coerceAtLeast(0f)
                 }
             }
@@ -618,9 +687,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             },
             write = { p, a, v ->
                 val f = io.izzel.taboolib.util.Coerce.toFloat(v)
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     p.walkSpeed = (p.walkSpeed + f).coerceAtMost(0.99f).coerceAtLeast(0f)
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     p.walkSpeed = f.coerceAtMost(0.99f).coerceAtLeast(0f)
                 }
             }
@@ -633,9 +702,9 @@ enum class PlayerOperators(val operator: PlayerOperator) {
                 TabooLibAPI.getPluginBridge().economyLook(it)
             },
             write = { p, a, v ->
-                if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.ADD) {
+                if (a == Symbol.ADD) {
                     io.izzel.taboolib.module.compat.EconomyHook.add(p, io.izzel.taboolib.util.Coerce.toDouble(v))
-                } else if (a == io.izzel.taboolib.kotlin.kether.action.bukkit.Symbol.SET) {
+                } else if (a == Symbol.SET) {
                     io.izzel.taboolib.module.compat.EconomyHook.set(p, io.izzel.taboolib.util.Coerce.toDouble(v))
                 }
             }
@@ -645,8 +714,16 @@ enum class PlayerOperators(val operator: PlayerOperator) {
     REGION(
         PlayerOperator(
             read = {
-                val region = io.izzel.taboolib.TabooLibAPI.getPluginBridge().worldguardGetRegion(it.world, it.location)
+                val region = TabooLibAPI.getPluginBridge().worldguardGetRegion(it.world, it.location)
                 if (region!!.isEmpty()) "__global__" else region
+            }
+        )
+    ),
+
+    PROTOCOL_VERSION(
+        PlayerOperator(
+            read = {
+                it.protocolVersion
             }
         )
     ),
@@ -654,7 +731,15 @@ enum class PlayerOperators(val operator: PlayerOperator) {
     VERSION(
         PlayerOperator(
             read = {
-                io.izzel.taboolib.TabooLibAPI.getPluginBridge().viaVersionPlayerVersion(it)
+                TabooLibAPI.getPluginBridge().viaVersionPlayerVersion(it)
+            }
+        )
+    ),
+
+    PING(
+        PlayerOperator(
+            read = {
+                it.spigot().ping
             }
         )
     ),
