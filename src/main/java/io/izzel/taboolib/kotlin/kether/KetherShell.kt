@@ -3,6 +3,7 @@ package io.izzel.taboolib.kotlin.kether
 import io.izzel.kether.common.api.Quest
 import io.izzel.kether.common.util.LocalizedException
 import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 object KetherShell {
 
@@ -13,9 +14,33 @@ object KetherShell {
         source: List<String>,
         cacheScript: Boolean = true,
         namespace: List<String> = emptyList(),
+        context: Consumer<ScriptContext>
+    ): CompletableFuture<Any?> {
+        return eval(source, cacheScript, namespace) {
+            context.accept(this)
+        }
+    }
+
+    @Throws(LocalizedException::class)
+    fun eval(
+        source: List<String>,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
         context: ScriptContext.() -> Unit = {}
     ): CompletableFuture<Any?> {
         return eval(source.joinToString("\n"), cacheScript, namespace, context)
+    }
+
+    @Throws(LocalizedException::class)
+    fun eval(
+        source: String,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        context: Consumer<ScriptContext>
+    ): CompletableFuture<Any?> {
+        return eval(source, cacheScript, namespace) {
+            context.accept(this)
+        }
     }
 
     @Throws(LocalizedException::class)

@@ -3,6 +3,7 @@ package io.izzel.taboolib.kotlin.kether
 import io.izzel.kether.common.api.Quest
 import io.izzel.kether.common.util.LocalizedException
 import java.util.*
+import java.util.function.Consumer
 import kotlin.collections.HashMap
 
 /**
@@ -14,6 +15,19 @@ object KetherFunction {
 
     val scriptMap = HashMap<String, Quest>()
     val functionMap = HashMap<String, Function>()
+
+    @Throws(LocalizedException::class)
+    fun parse(
+        input: String,
+        cacheFunction: Boolean = false,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        context: Consumer<ScriptContext>
+    ): String {
+        return parse(input, cacheFunction, cacheScript, namespace) {
+            context.accept(this)
+        }
+    }
 
     @Throws(LocalizedException::class)
     fun parse(
