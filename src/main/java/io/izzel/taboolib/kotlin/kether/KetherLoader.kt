@@ -4,6 +4,7 @@ import io.izzel.kether.common.api.QuestActionParser
 import io.izzel.taboolib.TabooLibLoader
 import io.izzel.taboolib.module.inject.TInjectHelper
 import io.izzel.taboolib.util.Ref
+import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 
 /**
@@ -13,7 +14,7 @@ import org.bukkit.plugin.Plugin
  * @author sky
  * @since 2021/2/6 3:33 下午
  */
-class KetherLoader : TabooLibLoader.Loader {
+class KetherLoader : TabooLibLoader.Loader, Listener {
 
     override fun activeLoad(plugin: Plugin, pluginClass: Class<*>) {
         pluginClass.declaredMethods.forEach {
@@ -37,6 +38,23 @@ class KetherLoader : TabooLibLoader.Loader {
                         parser.value.forEach { name ->
                             Kether.addAction(name, it.invoke(unsafe) as QuestActionParser, parser.namespace)
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun unload(plugin: Plugin, pluginClass: Class<*>) {
+        pluginClass.declaredMethods.forEach {
+            if (it.isAnnotationPresent(KetherParser::class.java)) {
+                val parser = it.getAnnotation(KetherParser::class.java)
+                if (parser.value.isEmpty()) {
+                    parser.release.forEach { name ->
+                        Kether.removeAction(name, parser.namespace)
+                    }
+                } else {
+                    parser.value.forEach { name ->
+                        Kether.removeAction(name, parser.namespace)
                     }
                 }
             }
