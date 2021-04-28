@@ -36,11 +36,11 @@ class Workspace(val file: File, val extension: String = ".ks", val namespace: Li
         loadSettings()
 
         scripts.forEach {
-            if (Coerce.toBoolean(ScriptService.INSTANCE.getQuestSettings(it.value.id)["autostart"])) {
+            if (Coerce.toBoolean(scriptsSetting[it.value.id]?.get("autostart"))) {
                 ScriptService.INSTANCE.startQuest(ScriptContext.create(it.value))
                 return@forEach
             }
-            val trigger = ScriptService.INSTANCE.getQuestSettings(it.value.id)["start"] ?: return@forEach
+            val trigger = scriptsSetting[it.value.id]?.get("start") ?: return@forEach
             val operator = Kether.getEventOperator(trigger.toString())
             if (operator == null) {
                 println("[TabooLib] Unknown starting trigger $trigger")
