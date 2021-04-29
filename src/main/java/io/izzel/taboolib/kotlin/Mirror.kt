@@ -117,7 +117,7 @@ class Mirror {
             }.sortedByDescending {
                 it.second
             }.forEach {
-                it.first.print(sender, all, space + 1)
+                it.first.print(sender, all, if (data != null) space + 1 else space)
             }
         }
 
