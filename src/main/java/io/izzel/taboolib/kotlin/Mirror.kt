@@ -1,6 +1,7 @@
 package io.izzel.taboolib.kotlin
 
 import com.google.common.collect.Maps
+import io.izzel.taboolib.util.Ref
 import io.izzel.taboolib.util.Strings
 import org.bukkit.command.CommandSender
 import java.math.BigDecimal
@@ -32,7 +33,7 @@ class Mirror {
     }
 
     fun collect(opt: Options.() -> Unit = {}): MirrorCollect {
-        val options = Options().also(opt)
+        val options = Options(Ref.getCallerPlugin().name).also(opt)
         val collect = MirrorCollect(this, options, "/", "/")
         dataMap.entries.forEach { mirror ->
             var point = collect
@@ -41,6 +42,13 @@ class Mirror {
             }
         }
         return collect
+    }
+
+    fun collectAndReport(sender: CommandSender, opt: Options.() -> Unit = {}): MirrorCollect {
+        return collect(opt).run {
+            print(sender, getTotal(), 0)
+            this
+        }
     }
 
     @Deprecated("unsafe", ReplaceWith("mirrorFuture()"))
@@ -60,11 +68,10 @@ class Mirror {
         finish(id)
     }
 
-    class Options {
+    class Options(val prefix: String) {
 
-        var prefix = "§c[TabooLib]"
-        var childFormat = "$prefix §8{0}§f{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
-        var parentFormat = "$prefix §8{0}§7{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
+        var childFormat = "§c[$prefix] §8{0}§f{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
+        var parentFormat = "§c[$prefix] §8{0}§7{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
     }
 
     class MirrorFuture {
@@ -94,15 +101,17 @@ class Mirror {
         }
 
         fun print(sender: CommandSender, all: BigDecimal, space: Int) {
-            val spaceStr = (1..space).joinToString("", postfix = " ") { "···" }
+            val prefix = "${Strings.copy("···", space)}${if (space > 0) " " else ""}"
             val total = getTotal()
             val data = mirror.dataMap[key]
-            val count = data?.count ?: 0
-            val avg = data?.getAverage() ?: 0.0
-            val min = data?.getLowest() ?: 0
-            val max = data?.getHighest() ?: 0
-            val format = if (sub.isEmpty()) opt.childFormat else opt.parentFormat
-            sender.sendMessage(format.replaceWithOrder(spaceStr, path, count, avg, min, max, percent(all, total)))
+            if (data != null) {
+                val count = data.count
+                val avg = data.getAverage()
+                val min = data.getLowest()
+                val max = data.getHighest()
+                val format = if (sub.isEmpty()) opt.childFormat else opt.parentFormat
+                sender.sendMessage(format.replaceWithOrder(prefix, path, count, avg, min, max, percent(all, total)))
+            }
             sub.values.map {
                 it to percent(all, it.getTotal())
             }.sortedByDescending {
