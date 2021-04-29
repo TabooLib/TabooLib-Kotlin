@@ -16,6 +16,13 @@ class Mirror {
 
     val dataMap = Maps.newConcurrentMap<String, MirrorData>()!!
 
+    fun mirrorTask(id: String, func: () -> Any?): Any? {
+        val time = System.nanoTime()
+        val r = func()
+        dataMap.computeIfAbsent(id) { MirrorData() }.finish(time)
+        return r
+    }
+
     fun mirrorFuture(id: String, func: MirrorFuture.() -> Unit) {
         func(MirrorFuture().also { mf ->
             mf.future.thenApply {
