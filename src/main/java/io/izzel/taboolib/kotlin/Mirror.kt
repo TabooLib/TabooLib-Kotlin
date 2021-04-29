@@ -62,8 +62,9 @@ class Mirror {
 
     class Options {
 
-        var childFormat = "§c[TabooLib] §8{0}§f{1} §8[{2} ms] §c[{3} ms] §7{4}%"
-        var parentFormat = "§c[TabooLib] §8{0}§7{1} §8[{2} ms] §c[{3} ms] §7{4}%"
+        var prefix = "§c[TabooLib]"
+        var childFormat = "$prefix §8{0}§f{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
+        var parentFormat = "$prefix §8{0}§7{1} §8count({2})§c avg({3}ms) §7{4}ms ~ {5}ms §8··· §7{6}%"
     }
 
     class MirrorFuture {
@@ -93,11 +94,15 @@ class Mirror {
         }
 
         fun print(sender: CommandSender, all: BigDecimal, space: Int) {
-            val spaceStr = (1..space).joinToString("") { "···" }
+            val spaceStr = (1..space).joinToString("", postfix = " ") { "···" }
             val total = getTotal()
-            val avg = mirror.dataMap[key]?.getAverage() ?: 0.0
-            val message = Strings.replaceWithOrder(if (sub.isEmpty()) opt.childFormat else opt.parentFormat, spaceStr, path, total, avg, percent(all, total))
-            sender.sendMessage(message)
+            val data = mirror.dataMap[key]
+            val count = data?.count ?: 0
+            val avg = data?.getAverage() ?: 0.0
+            val min = data?.getLowest() ?: 0
+            val max = data?.getHighest() ?: 0
+            val format = if (sub.isEmpty()) opt.childFormat else opt.parentFormat
+            sender.sendMessage(format.replaceWithOrder(spaceStr, path, count, avg, min, max, percent(all, total)))
             sub.values.map {
                 it to percent(all, it.getTotal())
             }.sortedByDescending {
