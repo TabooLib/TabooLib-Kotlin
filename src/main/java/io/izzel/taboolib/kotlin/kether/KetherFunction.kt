@@ -13,8 +13,7 @@ object KetherFunction {
 
     val regex = Regex("\\{\\{(.*?)}}")
 
-    val scriptMap = HashMap<String, Quest>()
-    val functionMap = HashMap<String, Function>()
+    val mainCache = Cache()
 
     @Throws(LocalizedException::class)
     fun parse(
@@ -24,7 +23,7 @@ object KetherFunction {
         namespace: List<String> = emptyList(),
         context: Consumer<ScriptContext>
     ): String {
-        return parse(input, cacheFunction, cacheScript, namespace) {
+        return parse(input, cacheFunction, cacheScript, namespace, mainCache) {
             context.accept(this)
         }
     }
@@ -37,12 +36,24 @@ object KetherFunction {
         namespace: List<String> = emptyList(),
         context: ScriptContext.() -> Unit = {}
     ): String {
-        val function = if (cacheFunction) this.functionMap.computeIfAbsent(input) {
+        return parse(input, cacheFunction, cacheScript, namespace, mainCache, context)
+    }
+
+    @Throws(LocalizedException::class)
+    fun parse(
+        input: String,
+        cacheFunction: Boolean = false,
+        cacheScript: Boolean = true,
+        namespace: List<String> = emptyList(),
+        cache: Cache = mainCache,
+        context: ScriptContext.() -> Unit = {}
+    ): String {
+        val function = if (cacheFunction) cache.functionMap.computeIfAbsent(input) {
             input.toFunction()
         } else {
             input.toFunction()
         }
-        val script = if (cacheScript) this.scriptMap.computeIfAbsent(function.source) {
+        val script = if (cacheScript) cache.scriptMap.computeIfAbsent(function.source) {
             ScriptLoader.load(it, namespace)
         } else {
             ScriptLoader.load(function.source, namespace)
@@ -85,6 +96,13 @@ object KetherFunction {
 
     class Function(val element: List<Element>, source: String) {
 
-        val source = "def main = { $source }"
+        val source = if (source.startsWith("def")) source else "def main = { $source }"
+    }
+
+    class Cache {
+
+        val scriptMap = HashMap<String, Quest>()
+
+        val functionMap = HashMap<String, Function>()
     }
 }

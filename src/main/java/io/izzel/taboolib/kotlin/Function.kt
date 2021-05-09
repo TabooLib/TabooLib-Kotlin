@@ -1,6 +1,7 @@
 package io.izzel.taboolib.kotlin
 
 import io.izzel.taboolib.Version
+import io.izzel.taboolib.module.db.local.LocalPlayer
 import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.nms.NMS
 import io.izzel.taboolib.util.Ref
@@ -8,6 +9,7 @@ import io.izzel.taboolib.util.Strings
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 fun MutableList<Any>.setSafely(index: Int, element: Any, def: Any = "") {
@@ -70,6 +72,8 @@ fun nmsClass(nms: String): Class<*> {
 fun obcClass(obc: String): Class<*> {
     return Class.forName("org.bukkit.craftbukkit." + Version.getBukkitVersion() + "." + obc)
 }
+
+fun Player.getLocalData() = LocalPlayer.get(this)!!
 
 fun ItemStack.getCompound() = NMS.handle().loadNBT(this)
 
