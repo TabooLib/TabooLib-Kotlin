@@ -88,17 +88,21 @@ fun CommandSender.sendLocale(node: String, vararg args: Any) {
 }
 
 inline fun <T> Iterable<T>.subBy(selector: (T) -> Int): Int {
-    var sum = 0
-    for (element in this) {
-        sum -= selector(element)
+    var sum = selector(firstOrNull() ?: return 0)
+    forEachIndexed { index, element ->
+        if (index > 0) {
+            sum -= selector(element)
+        }
     }
     return sum
 }
 
 inline fun <T> Iterable<T>.subByDouble(selector: (T) -> Double): Double {
-    var sum = 0.0
-    for (element in this) {
-        sum -= selector(element)
+    var sum = selector(firstOrNull() ?: return 0.0)
+    forEachIndexed { index, element ->
+        if (index > 0) {
+            sum -= selector(element)
+        }
     }
     return sum
 }
