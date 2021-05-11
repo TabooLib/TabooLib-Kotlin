@@ -743,4 +743,76 @@ enum class PlayerOperators(val operator: PlayerOperator) {
             }
         )
     ),
+
+    POSE(
+        PlayerOperator(
+            read = {
+                it.pose.name
+            }
+        )
+    ),
+
+    FACING(
+        PlayerOperator(
+            read = {
+                it.facing.name
+            }
+        )
+    ),
+
+    IN_LAVA(
+        PlayerOperator(
+            read = {
+                it.isInLava
+            }
+        )
+    ),
+
+    IN_RAIN(
+        PlayerOperator(
+            read = {
+                it.isInRain
+            }
+        )
+    ),
+
+    IN_WATER(
+        PlayerOperator(
+            read = {
+                it.isInWater
+            }
+        )
+    ),
+
+    IN_BUBBLE_COLUMN(
+        PlayerOperator(
+            read = {
+                it.isInBubbleColumn
+            }
+        )
+    ),
+
+    IN_WATER_OR_RAIN(
+        PlayerOperator(
+            read = {
+                it.isInWaterOrRain
+            }
+        )
+    ),
+
+    IN_WATER_OR_BUBBLE_COLUMN(
+        PlayerOperator(
+            read = {
+                it.isInWaterOrBubbleColumn
+            }
+        )
+    ),
+
+    IN_WATER_OR_RAIN_OR_BUBBLE_COLUMN(
+        PlayerOperator(
+            read = {
+                it.isInWaterOrRainOrBubbleColumn
+            }
+        )
+    ),
 }
