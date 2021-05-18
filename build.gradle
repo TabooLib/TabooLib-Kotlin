@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.0-rc'
     id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'maven'
 }
 
 group = 'io.izzel.taboolib.kotlin'
@@ -11,7 +12,6 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
-    maven { url "http://repo.ptms.ink/repository/codemc-nms/" }
     maven { url "http://repo.ptms.ink/repository/maven-releases/" }
     mavenCentral()
 }
@@ -35,4 +35,22 @@ shadowJar {
         it.include it.dependency('io.izzel.kether:.*')
     }
     relocate 'io.izzel.kether', 'io.izzel.taboolib.kotlin.kether'
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'http://ptms.ink:8081/repository/maven-releases/') {
+                authentication(userName: project.findProperty('user'), password: project.findProperty('password'))
+            }
+            pom.artifactId = rootProject.name
+            pom.groupId = 'io.izzel.taboolib'
+            pom.version = project.version
+            pom.packaging = 'jar'
+        }
+    }
+}
+
+artifacts {
+    archives shadowJar
 }
