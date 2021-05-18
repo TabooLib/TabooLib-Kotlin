@@ -17,7 +17,13 @@ class ActionPlayer(val operator: PlayerOperator, val symbol: Symbol, val value: 
         val viewer = (context.context() as ScriptContext).sender as? Player ?: throw RuntimeException("No player selected.")
         return if (value != null) {
             context.newFrame(value).run<Any>().thenApplyAsync({
-                operator.write?.invoke(viewer, symbol, it)
+                try {
+                    operator.write?.invoke(viewer, symbol, it)
+                } catch (ex: NoSuchMethodError) {
+                    viewer.sendMessage("§cOperator not supported. (${ex.localizedMessage})")
+                } catch (ex: NoSuchFieldError) {
+                    viewer.sendMessage("§cOperator not supported. (${ex.localizedMessage})")
+                }
             }, context.context().executor)
         } else {
             CompletableFuture.completedFuture(operator.read?.invoke(viewer))

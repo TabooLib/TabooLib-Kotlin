@@ -87,21 +87,25 @@ class ActionMath(val type: Type, val array: List<ParsedAction<*>>) : QuestAction
 
         /**
          * math + [ 1 2 3 ]
+         * math 1 + 1
          */
         @KetherParser(["math"])
         fun parser0() = ScriptParser.parser {
-            ActionMath(when (it.expects(
+            when (it.expects(
                 "add", "plus", "+",
                 "sub", "minus", "-",
                 "mul", "times", "*",
                 "div", "divided", "/"
             )) {
-                "add", "plus", "+" -> Type.ADD
-                "sub", "minus", "-" -> Type.SUB
-                "mul", "times", "*" -> Type.MUL
-                "div", "divided", "/" -> Type.DIV
-                else -> error("out of case")
-            }, it.next(ArgTypes.listOf(ArgTypes.ACTION)))
+                "add", "plus", "+" -> ActionMath(Type.ADD, it.next(ArgTypes.listOf(ArgTypes.ACTION)))
+                "sub", "minus", "-" -> ActionMath(Type.SUB, it.next(ArgTypes.listOf(ArgTypes.ACTION)))
+                "mul", "times", "*" -> ActionMath(Type.MUL, it.next(ArgTypes.listOf(ArgTypes.ACTION)))
+                "div", "divided", "/" -> ActionMath(Type.DIV, it.next(ArgTypes.listOf(ArgTypes.ACTION)))
+                else -> {
+
+                    error(1)
+                }
+            }
         }
     }
 }
