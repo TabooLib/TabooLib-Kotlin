@@ -45,14 +45,15 @@ class ActionEvent(val key: String, val symbol: Symbol, val value: ParsedAction<*
 
         @KetherParser(["event"])
         fun parser() = ScriptParser.parser {
-            val symbol = when (val type = it.nextToken()) {
-                "set" -> Symbol.SET
-                "get" -> Symbol.GET
-                else -> throw KetherError.NOT_EVENT_OPERATOR.create(type)
-            }
             val key = it.nextToken()
-            val value = it.next(ArgTypes.ACTION)
-            ActionEvent(key, symbol, value)
+            try {
+                it.mark()
+                it.expect("to")
+                ActionEvent(key, Symbol.SET, it.next(ArgTypes.ACTION))
+            } catch (ex: Throwable) {
+                it.reset()
+                ActionEvent(key, Symbol.GET, ParsedAction.noop<Any>())
+            }
         }
     }
 }
