@@ -66,8 +66,8 @@ class ActionLocation(
             val x = it.next(ArgTypes.ACTION)
             val y = it.next(ArgTypes.ACTION)
             val z = it.next(ArgTypes.ACTION)
-            var yaw: ParsedAction<*> = ParsedAction(LiteralAction<Any>(0f))
-            var pitch: ParsedAction<*> = ParsedAction(LiteralAction<Any>(0f))
+            var yaw: ParsedAction<*> = ParsedAction(LiteralAction<Any>("0"))
+            var pitch: ParsedAction<*> = ParsedAction(LiteralAction<Any>("0"))
             it.mark()
             try {
                 it.expect("and")

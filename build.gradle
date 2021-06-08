@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'io.izzel.taboolib.kotlin'
-version = '1.0.71'
+version = '1.0.73'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -20,7 +20,7 @@ dependencies {
     compileOnly 'io.izzel.taboolib:TabooLib:5.44:all'
     implementation 'ink.ptms.core:v11604:11604:all'
     implementation 'ink.ptms.core:v11200:11200:all'
-    implementation 'io.izzel.kether:common:1.0.10'
+    implementation 'io.izzel.kether:common:1.0.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation fileTree(dir: 'libs', includes: ['*.jar'])
 }
