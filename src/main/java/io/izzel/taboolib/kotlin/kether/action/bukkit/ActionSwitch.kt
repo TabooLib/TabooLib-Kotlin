@@ -5,8 +5,8 @@ import io.izzel.kether.common.api.QuestAction
 import io.izzel.kether.common.api.QuestContext
 import io.izzel.kether.common.loader.types.ArgTypes
 import io.izzel.taboolib.kotlin.kether.KetherParser
-import io.izzel.taboolib.kotlin.kether.ScriptContext
 import io.izzel.taboolib.kotlin.kether.ScriptParser
+import io.izzel.taboolib.kotlin.kether.script
 import org.bukkit.Bukkit
 import java.util.concurrent.CompletableFuture
 
@@ -18,9 +18,9 @@ class ActionSwitch(val sender: ParsedAction<*>) : QuestAction<Void>() {
     override fun process(context: QuestContext.Frame): CompletableFuture<Void> {
         return context.newFrame(sender).run<Any>().thenAccept {
             if (it.toString() == "console") {
-                (context as ScriptContext).sender = Bukkit.getConsoleSender()
+                context.script().sender = Bukkit.getConsoleSender()
             } else {
-                (context as ScriptContext).sender = Bukkit.getPlayerExact(it.toString())
+                context.script().sender = Bukkit.getPlayerExact(it.toString())
             }
         }
     }
