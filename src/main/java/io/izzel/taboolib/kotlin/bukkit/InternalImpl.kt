@@ -4,6 +4,7 @@ import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Reflex.Companion.toReflex
 import io.izzel.taboolib.module.packet.TPacketHandler
 import net.minecraft.server.v1_16_R3.*
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 class InternalImpl : Internal() {
@@ -86,7 +87,7 @@ class InternalImpl : Internal() {
      * @see PacketPlayOutScoreboardTeam
      */
     private fun initTeam(player: Player) {
-        uniqueColors.forEachIndexed { index, color ->
+        uniqueColors.forEachIndexed { _, color ->
             if (Version.isAfter(Version.v1_13)) {
                 val packet = PacketPlayOutScoreboardTeam()
                 val reflex = packet.toReflex()
@@ -107,9 +108,16 @@ class InternalImpl : Internal() {
             reflex.set("b", color)
             reflex.set("e", ScoreboardTeamBase.EnumNameTagVisibility.ALWAYS.e)
             // Collections$SingletonList cannot be cast to java.lang.Number
-            reflex.set("g", index)
-            reflex.set("h", 0)
-            reflex.set("f", -1)
+            if (Version.isAfter(Version.v1_9)) {
+                reflex.set("f", "always")
+                reflex.set("g", -1)
+                reflex.set("h", listOf(color))
+                reflex.set("i", 0)
+            } else {
+                reflex.set("f", -1)
+                reflex.set("g", listOf(color))
+                reflex.set("h", 0)
+            }
             TPacketHandler.sendPacket(player, packet)
         }
     }
@@ -138,7 +146,9 @@ class InternalImpl : Internal() {
 
         if (content.length > 16) {
             prefix = content.substring(0 until 16)
-            suffix = content.substring(16 until content.length)
+            val color = ChatColor.getLastColors(prefix)
+            suffix = color + content.substring(16 until content.length)
+            require(suffix.length <= 16) { "Scoreboard content is too long in this version of Minecraft!" }
         }
         val packet = PacketPlayOutScoreboardTeam()
         val reflex = packet.toReflex()
