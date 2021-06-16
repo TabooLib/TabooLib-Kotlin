@@ -86,7 +86,7 @@ class InternalImpl : Internal() {
      * @see PacketPlayOutScoreboardTeam
      */
     private fun initTeam(player: Player) {
-        uniqueColors.forEachIndexed { _, color ->
+        uniqueColors.forEachIndexed { index, color ->
             if (Version.isAfter(Version.v1_13)) {
                 val packet = PacketPlayOutScoreboardTeam()
                 val reflex = packet.toReflex()
@@ -106,7 +106,8 @@ class InternalImpl : Internal() {
             reflex.set("a", color)
             reflex.set("b", color)
             reflex.set("e", ScoreboardTeamBase.EnumNameTagVisibility.ALWAYS.e)
-            reflex.set("g", listOf(color))
+            // Collections$SingletonList cannot be cast to java.lang.Number
+            reflex.set("g", index)
             reflex.set("h", 0)
             reflex.set("f", -1)
             TPacketHandler.sendPacket(player, packet)
