@@ -4,6 +4,7 @@ import io.izzel.taboolib.Version
 import io.izzel.taboolib.kotlin.Reflex.Companion.toReflex
 import io.izzel.taboolib.module.packet.TPacketHandler
 import net.minecraft.server.v1_16_R3.*
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 
 class InternalImpl : Internal() {
@@ -145,7 +146,9 @@ class InternalImpl : Internal() {
 
         if (content.length > 16) {
             prefix = content.substring(0 until 16)
-            suffix = content.substring(16 until content.length)
+            val color = ChatColor.getLastColors(prefix)
+            suffix = color + content.substring(16 until content.length)
+            require(suffix.length <= 16) { "Scoreboard content is too long in this version of Minecraft!" }
         }
         val packet = PacketPlayOutScoreboardTeam()
         val reflex = packet.toReflex()
