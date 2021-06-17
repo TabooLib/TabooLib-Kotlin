@@ -153,7 +153,7 @@ class InternalImpl : Internal() {
         val packet = PacketPlayOutScoreboardTeam()
         val reflex = packet.toReflex()
         reflex.set("a", team)
-        reflex.set("h", 2)
+        reflex.set(if (Version.isAfter(Version.v1_9)) "i" else "h", 2)
         reflex.set("c", prefix)
         reflex.set("d", suffix)
         TPacketHandler.sendPacket(player, packet)
